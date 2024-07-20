@@ -13,6 +13,8 @@
 #define GL_GLEXT_PROTOTYPES
 #include <glcorearb.h>
 
+#include "quartz_math.hpp"
+
 struct quartz_window
 {
     int width;
@@ -39,6 +41,12 @@ struct quartz_texture
 
 extern quartz_context quartz_implicit_context;
 
+struct quartz_camera2D
+{
+    float x, y;
+    float width, height;
+};
+
 void quartz_start(int width, int height, const char* title);
 void quartz_update_events();
 void quartz_swap_buffers();
@@ -53,6 +61,8 @@ void quartz_texture_bind_slot(quartz_texture texture, GLuint slot);
 GLuint quartz_shader_from_source(GLenum shader_type, const char* shader_src);
 GLuint quartz_program_from_shaders(GLuint vs_id, GLuint fs_id, bool use_program_now);
 void quartz_compile_shader(GLuint shader_id);
+
+quartz_mat4 quartz_camera2D_to_mat4(quartz_camera2D camera);
 
 #define QUARTZ_DEBUG_BREAK() __debugbreak()
 

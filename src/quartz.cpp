@@ -201,8 +201,8 @@ quartz_texture quartz_texture_from_file(const char* path)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
     glBindTexture(GL_TEXTURE_2D, 0);
@@ -257,4 +257,13 @@ void quartz_compile_shader(GLuint shader_id)
         glGetShaderInfoLog(shader_id, 2048, 0, shaderLog);
         QUARTZ_ASSERT(false, shaderLog);
     }
+}
+
+quartz_mat4 quartz_camera2D_to_mat4(quartz_camera2D camera)
+{
+    return quartz_orth_proj(camera.x - camera.width / 2,
+                            camera.x + camera.width / 2,
+                            camera.y - camera.height / 2,
+                            camera.y + camera.height / 2,
+                            -1.0, 1.0);
 }

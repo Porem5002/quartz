@@ -5,6 +5,7 @@
 #undef STB_IMAGE_IMPLEMENTATION
 
 #include "quartz.cpp"
+#include "quartz_math.cpp"
 #include "glload.cpp"
 
 static void APIENTRY gl_debug_callback(GLenum source, GLenum type, 
@@ -23,13 +24,14 @@ int main()
     glEnable(GL_DEBUG_OUTPUT);
 
     const char* vertex_shader = "#version 430 core\n"
-                                "layout (location = 0) in vec4 vertexPos;\n"
+                                "layout (location = 0) in vec2 vertexPos;\n"
                                 "layout (location = 1) in vec2 texturePos;\n"
                                 "layout (location = 0) out vec2 out_texturePos;\n"
+                                "uniform mat4 u_mvp;"
                                 "void main()\n"
                                 "{\n"
                                     "out_texturePos = texturePos;\n"
-                                    "gl_Position = vertexPos;\n"
+                                    "gl_Position = mvp * vec4(vertexPos, 0, 1.0);\n"
                                 "}\n";
     
     const char* frag_shader = "#version 430 core\n"
@@ -38,7 +40,7 @@ int main()
                             "out vec4 fragColor;\n"
                             "void main()\n"
                             "{\n"
-                                "fragColor = texture(u_Texture, texturePos);\n"
+                                "fragColor = texelFetch(u_Texture, ivec2(texturePos), 0);\n"
                             "}\n";
 
     GLuint vs_id = quartz_shader_from_source(GL_VERTEX_SHADER, vertex_shader);
@@ -55,10 +57,10 @@ int main()
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     float vertices [] = {
-        -0.5, -0.5, 0, 0,
-        0.5, -0.5, 1, 0,
-        0.5, 0.5, 1, 1,
-        -0.5, 0.5, 0, 1
+        -8, -8, 16, 1024 - 16,
+        8, -8, 32, 1024 - 16,
+        8, 8, 32, 1024,
+        -8, 8, 16, 1024
     };
 
     unsigned int indices [] = {
@@ -83,6 +85,15 @@ int main()
 
     quartz_texture texture = quartz_texture_from_file("assets/TEXTURE_ATLAS.png");
     quartz_texture_bind_slot(texture, 0);
+
+    quartz_camera2D cam = {};
+    cam.width = 320;
+    cam.height = 180;
+
+    quartz_mat4 proj = quartz_camera2D_to_mat4(cam);
+
+    GLuint u_mvp = glGetUniformLocation(program_id, "u_mvp");
+    glUniformMatrix4fv(u_mvp, 1, GL_FALSE, &proj.values[0][0]);
 
     while(quartz_is_running())
     {
