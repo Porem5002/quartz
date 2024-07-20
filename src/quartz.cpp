@@ -1,6 +1,8 @@
 #include "include/quartz.hpp"
 #include "include/glload.hpp"
 
+#include <stb_image.h>
+
 #include <wglext.h>
 
 quartz_context quartz_implicit_context;
@@ -181,6 +183,44 @@ int quartz_get_screen_width()
 int quartz_get_screen_height()
 {
     return quartz_implicit_context.window.height;
+}
+
+quartz_texture quartz_texture_from_file(const char* path)
+{
+    stbi_set_flip_vertically_on_load(1);
+
+    int w, h, channels;
+    auto data = stbi_load(path, &w, &h, &channels, 4);
+
+    QUARTZ_ASSERT(data != nullptr, "Could not load texture from the path");
+
+    GLuint texture_id;
+    glGenTextures(1, &texture_id);
+    glBindTexture(GL_TEXTURE_2D, texture_id);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    stbi_image_free(data);
+
+    quartz_texture texture;
+    texture.id = texture_id;
+    texture.width = w;
+    texture.height = h;
+    texture.channels = channels;
+    return texture;
+}
+
+void quartz_texture_bind_slot(quartz_texture texture, GLuint slot)
+{
+    glActiveTexture(GL_TEXTURE0 + slot);
+    glBindTexture(GL_TEXTURE_2D, texture.id);
 }
 
 GLuint quartz_shader_from_source(GLenum shader_type, const char* shader_src)

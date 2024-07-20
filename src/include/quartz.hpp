@@ -31,6 +31,12 @@ struct quartz_context
     quartz_window window;
 };
 
+struct quartz_texture
+{
+    GLuint id;
+    int width, height, channels;
+};
+
 extern quartz_context quartz_implicit_context;
 
 void quartz_start(int width, int height, const char* title);
@@ -40,6 +46,9 @@ void quartz_swap_buffers();
 bool quartz_is_running();
 int quartz_get_screen_width();
 int quartz_get_screen_height();
+
+quartz_texture quartz_texture_from_file(const char* path);
+void quartz_texture_bind_slot(quartz_texture texture, GLuint slot);
 
 GLuint quartz_shader_from_source(GLenum shader_type, const char* shader_src);
 GLuint quartz_program_from_shaders(GLuint vs_id, GLuint fs_id, bool use_program_now);

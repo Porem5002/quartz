@@ -2,6 +2,7 @@
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
+#undef STB_IMAGE_IMPLEMENTATION
 
 #include "quartz.cpp"
 #include "glload.cpp"
@@ -23,16 +24,21 @@ int main()
 
     const char* vertex_shader = "#version 430 core\n"
                                 "layout (location = 0) in vec4 vertexPos;\n"
+                                "layout (location = 1) in vec2 texturePos;\n"
+                                "layout (location = 0) out vec2 out_texturePos;\n"
                                 "void main()\n"
                                 "{\n"
+                                    "out_texturePos = texturePos;\n"
                                     "gl_Position = vertexPos;\n"
                                 "}\n";
     
     const char* frag_shader = "#version 430 core\n"
+                            "layout (location = 0) in vec2 texturePos;"
+                            "layout (binding = 0) uniform sampler2D u_Texture;"
                             "out vec4 fragColor;\n"
                             "void main()\n"
                             "{\n"
-                                "fragColor = vec4(0.5, 1.0, 0.0, 1.0);\n"
+                                "fragColor = texture(u_Texture, texturePos);\n"
                             "}\n";
 
     GLuint vs_id = quartz_shader_from_source(GL_VERTEX_SHADER, vertex_shader);
@@ -45,11 +51,14 @@ int main()
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_GREATER);
 
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
     float vertices [] = {
-        -0.5, -0.5,
-        0.5, -0.5,
-        0.5, 0.5,
-        -0.5, 0.5,
+        -0.5, -0.5, 0, 0,
+        0.5, -0.5, 1, 0,
+        0.5, 0.5, 1, 1,
+        -0.5, 0.5, 0, 1
     };
 
     unsigned int indices [] = {
@@ -67,7 +76,13 @@ int main()
     glBufferData(GL_ARRAY_BUFFER, 16 * sizeof(float), vertices, GL_STATIC_DRAW);
 
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), nullptr);
+    glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), nullptr);
+
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (const void*)(2 * sizeof(float)));
+
+    quartz_texture texture = quartz_texture_from_file("assets/TEXTURE_ATLAS.png");
+    quartz_texture_bind_slot(texture, 0);
 
     while(quartz_is_running())
     {
@@ -79,7 +94,7 @@ int main()
 
         glViewport(0, 0, quartz_get_screen_width(), quartz_get_screen_height());
 
-        glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, indices);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, indices);
 
         quartz_swap_buffers();
     }
