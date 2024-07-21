@@ -14,6 +14,7 @@
 #include <glcorearb.h>
 
 #include "quartz_math.hpp"
+#include "quartz_draw.hpp"
 
 struct quartz_window
 {
@@ -31,12 +32,7 @@ struct quartz_context
 {
     bool running;
     quartz_window window;
-};
-
-struct quartz_texture
-{
-    GLuint id;
-    int width, height, channels;
+    quartz_render_buffer render_buffer;
 };
 
 extern quartz_context quartz_implicit_context;
@@ -66,14 +62,14 @@ quartz_mat4 quartz_camera2D_to_mat4(quartz_camera2D camera);
 
 #define QUARTZ_DEBUG_BREAK() __debugbreak()
 
-#define QUARTZ_LOG_INFO(MSG) do { fprintf(stderr, "INFO: %s", (MSG)); } while(0)
-#define QUARTZ_LOG_WARNING(MSG) do { fprintf(stderr, "WARNING: %s", (MSG)); } while(0)
-#define QUARTZ_LOG_ERROR(MSG) do { fprintf(stderr, "ERROR: %s", (MSG)); } while(0)
+#define QUARTZ_LOG_INFO(MSG) do { fprintf(stderr, "INFO: %s\n", (MSG)); } while(0)
+#define QUARTZ_LOG_WARNING(MSG) do { fprintf(stderr, "WARNING: %s\n", (MSG)); } while(0)
+#define QUARTZ_LOG_ERROR(MSG) do { fprintf(stderr, "ERROR: %s\n", (MSG)); } while(0)
 
 #define QUARTZ_ASSERT(COND, MSG) do {\
     if(!(COND))\
     {\
-        fprintf(stderr, "ASSERTION FAILED: %s", (MSG));\
+        fprintf(stderr, "ASSERTION FAILED: %s\n", (MSG));\
         QUARTZ_DEBUG_BREAK();\
         abort();\
     }\

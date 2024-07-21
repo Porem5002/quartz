@@ -3,6 +3,16 @@
 
 #include <cstdlib>
 
+struct quartz_uvec2
+{
+    unsigned int x, y;
+};
+
+struct quartz_vec2
+{
+    float x, y;
+};
+
 template<size_t Cols, size_t Rows>
 struct quartz_mat
 {

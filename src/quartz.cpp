@@ -238,6 +238,8 @@ GLuint quartz_program_from_shaders(GLuint vs_id, GLuint fs_id, bool use_program_
     glAttachShader(id, fs_id);
     glLinkProgram(id);
 
+    // TODO: Error check link program
+
     if(use_program_now)
         glUseProgram(id);
 
