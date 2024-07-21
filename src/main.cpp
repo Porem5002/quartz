@@ -6,7 +6,7 @@
 
 #include "quartz.cpp"
 #include "quartz_math.cpp"
-#include "quartz_draw.cpp"
+#include "quartz_renderer.cpp"
 #include "glload.cpp"
 
 static void APIENTRY gl_debug_callback(GLenum source, GLenum type, 
@@ -48,17 +48,12 @@ int main()
     GLuint fs_id = quartz_shader_from_source(GL_FRAGMENT_SHADER, frag_shader);
     GLuint program_id = quartz_program_from_shaders(vs_id, fs_id, true);
 
-    glEnable(GL_FRAMEBUFFER_SRGB);
     glDisable(GL_MULTISAMPLE);
 
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    GLuint va;
-    glGenVertexArrays(1, &va);
-    glBindVertexArray(va);
-
-    quartz_draw_init();
+    quartz_render_init();
 
     quartz_texture texture = quartz_texture_from_file("assets/TEXTURE_ATLAS.png");
     quartz_texture_bind_slot(texture, 0);
@@ -68,7 +63,6 @@ int main()
     cam.height = 180;
 
     quartz_mat4 proj = quartz_camera2D_to_mat4(cam);
-
     GLuint u_mvp = glGetUniformLocation(program_id, "u_mvp");
     glUniformMatrix4fv(u_mvp, 1, GL_FALSE, &proj.values[0][0]);
 
@@ -76,15 +70,11 @@ int main()
     {
         quartz_update_events();
 
-        glClearColor(0.2, 0.2, 0.23, 1.0);
-        glClearDepth(0);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        quartz_render_clear(0.2, 0.2, 0.23, 1.0);
 
-        glViewport(0, 0, quartz_get_screen_width(), quartz_get_screen_height());
-
-        quartz_draw_texture_slice(texture, {0, 0}, {{16, 0}, {15, 16}});
-        quartz_draw_texture_slice(texture, {-10, 1}, {{16, 0}, {15, 16}});
-        quartz_flush_draws();
+        quartz_render_texture_slice(texture, {0, 0}, {{16, 0}, {15, 16}});
+        quartz_render_texture_slice(texture, {-10, 1}, {{16, 0}, {15, 16}});
+        quartz_render_draw();
 
         quartz_swap_buffers();
     }

@@ -4,18 +4,11 @@
 #include <cstdlib>
 #include <cstdio>
 
-#ifdef _WIN32
-#ifndef WIN_LEAN_AND_MEAN
-#define WIN_LEAN_AND_MEAN 1
-#include <windows.h>
-#endif
-
-#define GL_GLEXT_PROTOTYPES
-#include <glcorearb.h>
-
+#include "glinclude.hpp"
 #include "quartz_math.hpp"
-#include "quartz_draw.hpp"
+#include "quartz_renderer.hpp"
 
+#ifdef _WIN32
 struct quartz_window
 {
     int width;

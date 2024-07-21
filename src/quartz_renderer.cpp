@@ -1,14 +1,16 @@
 #include <cstring>
-#include <cmath>
 
 #include "include/quartz.hpp"
-#include "include/quartz_draw.hpp"
+#include "include/quartz_renderer.hpp"
 #include "include/quartz_math.hpp"
 
-void quartz_draw_init()
+void quartz_render_init()
 {
     auto& render_buffer = quartz_implicit_context.render_buffer;
     render_buffer.size = 0;
+
+    glGenVertexArrays(1, &render_buffer.va_id);
+    glBindVertexArray(render_buffer.va_id);
 
     glGenBuffers(1, &render_buffer.buffer_id);
     glBindBuffer(GL_ARRAY_BUFFER, render_buffer.buffer_id);
@@ -21,7 +23,13 @@ void quartz_draw_init()
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(quartz_vb_elem), (const void*)offsetof(quartz_vb_elem, uvs));
 }
 
-void quartz_draw_texture(quartz_texture texture, quartz_vec2 pos)
+void quartz_render_clear(float r, float g, float b, float a)
+{
+    glClearColor(r, g, b, a);
+    glClear(GL_COLOR_BUFFER_BIT);
+}
+
+void quartz_render_texture(quartz_texture texture, quartz_vec2 pos)
 {
     auto& render_buffer = quartz_implicit_context.render_buffer;
 
@@ -55,7 +63,7 @@ void quartz_draw_texture(quartz_texture texture, quartz_vec2 pos)
     render_buffer.size++;
 }
 
-void quartz_draw_texture_slice(quartz_texture texture, quartz_vec2 pos, quartz_texture_slice slice)
+void quartz_render_texture_slice(quartz_texture texture, quartz_vec2 pos, quartz_texture_slice slice)
 {
     auto& render_buffer = quartz_implicit_context.render_buffer;
 
@@ -92,7 +100,7 @@ void quartz_draw_texture_slice(quartz_texture texture, quartz_vec2 pos, quartz_t
     render_buffer.size++;
 }
 
-void quartz_flush_draws()
+void quartz_render_draw()
 {
     auto& render_buffer = quartz_implicit_context.render_buffer;
 

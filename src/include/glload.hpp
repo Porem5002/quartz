@@ -1,8 +1,7 @@
 #ifndef GLLOAD_HEADER
 #define GLLOAD_HEADER
 
-#define GL_GLEXT_PROTOTYPES
-#include <glcorearb.h>
+#include "glinclude.hpp"
 
 using any_func_ptr = void (*) ();
 

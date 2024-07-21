@@ -1,9 +1,8 @@
 #include "include/quartz.hpp"
 #include "include/glload.hpp"
+#include "include/glinclude.hpp"
 
 #include <stb_image.h>
-
-#include <wglext.h>
 
 quartz_context quartz_implicit_context;
 
@@ -155,9 +154,15 @@ static LRESULT CALLBACK quartz_windows_window_callback(HWND window, UINT msg, WP
         case WM_SIZE:
         {
             RECT rect;
-            GetClientRect(window, &rect);    
-            quartz_implicit_context.window.width = rect.right - rect.left;
-            quartz_implicit_context.window.height = rect.bottom - rect.top;
+            GetClientRect(window, &rect);
+
+            int new_width = rect.right - rect.left;
+            int new_height = rect.bottom - rect.top;
+
+            quartz_implicit_context.window.width = new_width;
+            quartz_implicit_context.window.height = new_height;
+            
+            glViewport(0, 0, new_width, new_height);
             break;
         }
         default:
