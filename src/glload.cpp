@@ -56,6 +56,7 @@ static PFNGLDELETESHADERPROC glDeleteShader_ptr;
 static PFNGLDRAWELEMENTSINSTANCEDPROC glDrawElementsInstanced_ptr;
 static PFNGLGENERATEMIPMAPPROC glGenerateMipmap_ptr;
 static PFNGLDEBUGMESSAGECALLBACKPROC glDebugMessageCallback_ptr;
+static PFNGLGETINTEGERVPROC glGetIntegerv_ptr;
 
 void load_gl_functions()
 {
@@ -113,6 +114,7 @@ void load_gl_functions()
     glDrawElementsInstanced_ptr = (PFNGLDRAWELEMENTSINSTANCEDPROC) load_gl_function_by_name("glDrawElementsInstanced");
     glGenerateMipmap_ptr = (PFNGLGENERATEMIPMAPPROC) load_gl_function_by_name("glGenerateMipmap");
     glDebugMessageCallback_ptr = (PFNGLDEBUGMESSAGECALLBACKPROC)load_gl_function_by_name("glDebugMessageCallback");
+    glGetIntegerv_ptr = (PFNGLGETINTEGERVPROC)load_gl_function_by_name("glGetIntegerv");
 }
 
 any_func_ptr load_gl_function_by_name(const char* func_name)
@@ -417,4 +419,9 @@ void glGenerateMipmap(GLenum target)
 void glDebugMessageCallback (GLDEBUGPROC callback, const void *userParam)
 {
   glDebugMessageCallback_ptr(callback, userParam);
+}
+
+GLAPI void APIENTRY glGetIntegerv(GLenum pname, GLint *data)
+{
+    glGetIntegerv_ptr(pname, data);
 }

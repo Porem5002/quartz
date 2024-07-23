@@ -55,8 +55,8 @@ int main()
 
     quartz_render_init();
 
-    quartz_texture texture = quartz_texture_from_file("assets/TEXTURE_ATLAS.png");
-    quartz_texture_bind_slot(texture, 0);
+    quartz_texture texture1 = quartz_load_texture("assets/TEXTURE_ATLAS.png");
+    quartz_texture texture2 = quartz_load_texture("assets/terrain_atlas.png");
 
     quartz_camera2D cam = {};
     cam.width = 320;
@@ -72,8 +72,15 @@ int main()
 
         quartz_render_clear(0.2, 0.2, 0.23, 1.0);
 
-        quartz_render_texture_slice(texture, {0, 0}, {{16, 0}, {15, 16}});
-        quartz_render_texture_slice(texture, {-10, 1}, {{16, 0}, {15, 16}});
+        quartz_sprite dice = { texture1, {16, 0}, {15, 16} };
+        quartz_sprite tomatoes = { texture2, {388, 777}, {411 - 388, 797 - 777} };
+
+        for(size_t i = 0; i < 15; i++)
+            quartz_render_sprite(dice, {(float)(i * tomatoes.size.x) - 100, 0});
+
+        for(size_t i = 0; i < 15; i++)
+            quartz_render_sprite(tomatoes, {(float)(i * tomatoes.size.x) - 100, 20});
+        
         quartz_render_draw();
 
         quartz_swap_buffers();

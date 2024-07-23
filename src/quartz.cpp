@@ -1,10 +1,28 @@
+#include <stb_image.h>
+
 #include "include/quartz.hpp"
 #include "include/glload.hpp"
 #include "include/glinclude.hpp"
 
-#include <stb_image.h>
+struct quartz_context
+{
+    static constexpr size_t TEXTURE_CAP = 10;
 
-quartz_context quartz_implicit_context;
+    bool running;
+
+    size_t textures_size;
+    quartz_texture_info textures [TEXTURE_CAP];
+
+    int window_width, window_height;
+
+    #if _WIN32
+        HWND win_window;
+        HDC win_dc;
+        HGLRC win_rc;
+    #endif
+};
+
+quartz_context context;
 
 #ifdef _WIN32
 
@@ -117,20 +135,20 @@ void quartz_start(int width, int height, const char* title)
 
     ShowWindow(window, SW_SHOW);
 
-    quartz_implicit_context.running = true;
+    context.running = true;
     
-    quartz_implicit_context.window.width = width;
-    quartz_implicit_context.window.height = height;
-    quartz_implicit_context.window.window = window;
-    quartz_implicit_context.window.dc = dc;
-    quartz_implicit_context.window.rc = rc;
+    context.window_width = width;
+    context.window_height = height;
+    context.win_window = window;
+    context.win_dc = dc;
+    context.win_rc = rc;
 }
 
 void quartz_update_events()
 {
     MSG msg;
 
-    while(PeekMessageA(&msg, quartz_implicit_context.window.window, 0, 0, PM_REMOVE))
+    while(PeekMessageA(&msg, context.win_window, 0, 0, PM_REMOVE))
     {
         TranslateMessage(&msg);
         DispatchMessage(&msg); // Sends message to the callback function of the window
@@ -139,7 +157,7 @@ void quartz_update_events()
 
 void quartz_swap_buffers()
 {
-    SwapBuffers(quartz_implicit_context.window.dc);
+    SwapBuffers(context.win_dc);
 }
 
 static LRESULT CALLBACK quartz_windows_window_callback(HWND window, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -149,7 +167,7 @@ static LRESULT CALLBACK quartz_windows_window_callback(HWND window, UINT msg, WP
     switch (msg)
     {
         case WM_CLOSE:
-            quartz_implicit_context.running = false;
+            context.running = false;
             break;
         case WM_SIZE:
         {
@@ -159,8 +177,8 @@ static LRESULT CALLBACK quartz_windows_window_callback(HWND window, UINT msg, WP
             int new_width = rect.right - rect.left;
             int new_height = rect.bottom - rect.top;
 
-            quartz_implicit_context.window.width = new_width;
-            quartz_implicit_context.window.height = new_height;
+            context.window_width = new_width;
+            context.window_height = new_height;
             
             glViewport(0, 0, new_width, new_height);
             break;
@@ -177,20 +195,20 @@ static LRESULT CALLBACK quartz_windows_window_callback(HWND window, UINT msg, WP
 
 bool quartz_is_running()
 {
-    return quartz_implicit_context.running;
+    return context.running;
 }
 
 int quartz_get_screen_width()
 {
-    return quartz_implicit_context.window.width;
+    return context.window_width;
 }
 
 int quartz_get_screen_height()
 {
-    return quartz_implicit_context.window.height;
+    return context.window_height;
 }
 
-quartz_texture quartz_texture_from_file(const char* path)
+quartz_texture quartz_load_texture(const char* path)
 {
     stbi_set_flip_vertically_on_load(1);
 
@@ -214,18 +232,21 @@ quartz_texture quartz_texture_from_file(const char* path)
 
     stbi_image_free(data);
 
-    quartz_texture texture;
-    texture.id = texture_id;
-    texture.width = w;
-    texture.height = h;
-    texture.channels = channels;
+    QUARTZ_ASSERT(context.textures_size < context.TEXTURE_CAP, "Exceeded max textures allowed!");
+    quartz_texture_info* texture = &context.textures[context.textures_size++];
+    
+    texture->id = texture_id;
+    texture->width = w;
+    texture->height = h;
+    texture->channels = channels;
+    
     return texture;
 }
 
-void quartz_texture_bind_slot(quartz_texture texture, GLuint slot)
+void quartz_bind_texture(quartz_texture texture, GLuint slot)
 {
     glActiveTexture(GL_TEXTURE0 + slot);
-    glBindTexture(GL_TEXTURE_2D, texture.id);
+    glBindTexture(GL_TEXTURE_2D, texture->id);
 }
 
 GLuint quartz_shader_from_source(GLenum shader_type, const char* shader_src)
@@ -264,13 +285,4 @@ void quartz_compile_shader(GLuint shader_id)
         glGetShaderInfoLog(shader_id, 2048, 0, shaderLog);
         QUARTZ_ASSERT(false, shaderLog);
     }
-}
-
-quartz_mat4 quartz_camera2D_to_mat4(quartz_camera2D camera)
-{
-    return quartz_orth_proj(camera.x - camera.width / 2,
-                            camera.x + camera.width / 2,
-                            camera.y - camera.height / 2,
-                            camera.y + camera.height / 2,
-                            -1.0, 1.0);
 }

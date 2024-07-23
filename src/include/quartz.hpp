@@ -2,39 +2,9 @@
 #define QUARTZ_ENGINE_HEADER
 
 #include <cstdlib>
-#include <cstdio>
 
 #include "glinclude.hpp"
-#include "quartz_math.hpp"
-#include "quartz_renderer.hpp"
-
-#ifdef _WIN32
-struct quartz_window
-{
-    int width;
-    int height;
-
-    HWND window;
-    HDC dc;
-    HGLRC rc;
-};
-
-#endif
-
-struct quartz_context
-{
-    bool running;
-    quartz_window window;
-    quartz_render_buffer render_buffer;
-};
-
-extern quartz_context quartz_implicit_context;
-
-struct quartz_camera2D
-{
-    float x, y;
-    float width, height;
-};
+#include "quartz_common.hpp"
 
 void quartz_start(int width, int height, const char* title);
 void quartz_update_events();
@@ -44,29 +14,12 @@ bool quartz_is_running();
 int quartz_get_screen_width();
 int quartz_get_screen_height();
 
-quartz_texture quartz_texture_from_file(const char* path);
-void quartz_texture_bind_slot(quartz_texture texture, GLuint slot);
+quartz_texture quartz_load_texture(const char* path);
+void quartz_bind_texture(quartz_texture texture, GLuint slot);
 
 GLuint quartz_shader_from_source(GLenum shader_type, const char* shader_src);
 GLuint quartz_program_from_shaders(GLuint vs_id, GLuint fs_id, bool use_program_now);
 void quartz_compile_shader(GLuint shader_id);
-
-quartz_mat4 quartz_camera2D_to_mat4(quartz_camera2D camera);
-
-#define QUARTZ_DEBUG_BREAK() __debugbreak()
-
-#define QUARTZ_LOG_INFO(MSG) do { fprintf(stderr, "INFO: %s\n", (MSG)); } while(0)
-#define QUARTZ_LOG_WARNING(MSG) do { fprintf(stderr, "WARNING: %s\n", (MSG)); } while(0)
-#define QUARTZ_LOG_ERROR(MSG) do { fprintf(stderr, "ERROR: %s\n", (MSG)); } while(0)
-
-#define QUARTZ_ASSERT(COND, MSG) do {\
-    if(!(COND))\
-    {\
-        fprintf(stderr, "ASSERTION FAILED: %s\n", (MSG));\
-        QUARTZ_DEBUG_BREAK();\
-        abort();\
-    }\
-} while(0)
 
 #endif
 
