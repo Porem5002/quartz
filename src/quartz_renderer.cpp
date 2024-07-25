@@ -51,6 +51,10 @@ quartz_mat4 quartz_camera2D_to_mat4(quartz_camera2D camera)
 
 void quartz_render_init()
 {
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glDisable(GL_MULTISAMPLE);
+    
     renderer.batch_size = 0;
     renderer.curr_texture = nullptr;
 

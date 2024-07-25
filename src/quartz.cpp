@@ -3,209 +3,71 @@
 #include "include/quartz.hpp"
 #include "include/glload.hpp"
 #include "include/glinclude.hpp"
+#include "include/quartz_window.hpp"
 
 struct quartz_context
 {
     static constexpr size_t TEXTURE_CAP = 10;
 
-    bool running;
-
     size_t textures_size;
     quartz_texture_info textures [TEXTURE_CAP];
 
-    int window_width, window_height;
-
-    #if _WIN32
-        HWND win_window;
-        HDC win_dc;
-        HGLRC win_rc;
-    #endif
+    quartz_window window;
 };
 
 quartz_context context;
 
-#ifdef _WIN32
-
-static LRESULT CALLBACK quartz_windows_window_callback(HWND window, UINT msg, WPARAM wParam, LPARAM lParam);
+static void APIENTRY quartz_gl_debug_callback(GLenum source, GLenum type, 
+                                GLuint id, GLenum severity,
+                                GLsizei length, const GLchar *message,
+                                const void *userParam);
 
 void quartz_start(int width, int height, const char* title)
 {
-    HINSTANCE instance = GetModuleHandleA(0);
+    context.window = quartz_window_create(width, height, title);
 
-    WNDCLASSA wc = {};
-    wc.hInstance = instance;
-    wc.hIcon = LoadIcon(instance, IDI_APPLICATION);
-    wc.hCursor = LoadCursor(NULL, IDC_ARROW);
-    wc.lpszClassName = title; // This is not the title, but we use title as a unique identifier of the window
-    wc.lpfnWndProc = quartz_windows_window_callback; // Window callback function
+    load_gl_functions();
 
-    QUARTZ_ASSERT(RegisterClassA(&wc), "Failed on call to RegisterClassA during window creation");
-
-    int dwStyle = WS_OVERLAPPEDWINDOW;
-    
-    PFNWGLCHOOSEPIXELFORMATARBPROC wglChoosePixelFormatARB;
-    PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB;
-
-    // Generate temporary window, dc and rc so that we can extract special OPenGL functions 
-    {
-        HWND tmp_window = CreateWindowExA(0, title, // Unique identifier again
-                                        title, dwStyle, 100, 100, width, height, NULL, NULL, instance, NULL);
-        QUARTZ_ASSERT(tmp_window != NULL, "Failed to create dummy window for OpenGL setup!");
-
-        HDC tmp_dc = GetDC(tmp_window);
-        QUARTZ_ASSERT(tmp_dc != NULL, "Failed to get DC!");
-
-        PIXELFORMATDESCRIPTOR pfd = {};
-        pfd.nSize = sizeof(pfd);
-        pfd.nVersion = 1;
-        pfd.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
-        pfd.iPixelType = PFD_TYPE_RGBA;
-        pfd.cColorBits = 32;
-        pfd.cAlphaBits = 8;
-        pfd.cDepthBits = 24;
-
-        int pixelFormat = ChoosePixelFormat(tmp_dc, &pfd);
-        QUARTZ_ASSERT(pixelFormat != 0, "Failed to choose pixel format!");
-        QUARTZ_ASSERT(SetPixelFormat(tmp_dc, pixelFormat, &pfd), "Failed to set pixel format!");
-
-        // Create fake opengl rendering context
-        HGLRC tmp_rc = wglCreateContext(tmp_dc);
-        QUARTZ_ASSERT(tmp_rc != NULL, "Failed to create opengl context!");
-        QUARTZ_ASSERT(wglMakeCurrent(tmp_dc, tmp_rc) != 0, "Failed to make current!");
-
-        wglChoosePixelFormatARB = (PFNWGLCHOOSEPIXELFORMATARBPROC)load_gl_function_by_name("wglChoosePixelFormatARB");
-        wglCreateContextAttribsARB = (PFNWGLCREATECONTEXTATTRIBSARBPROC)load_gl_function_by_name("wglCreateContextAttribsARB");
-
-        // Cleanup temporary contexts
-        wglMakeCurrent(tmp_dc, 0);
-        wglDeleteContext(tmp_rc);
-        ReleaseDC(tmp_window, tmp_dc);
-        DestroyWindow(tmp_window);
-    }
-    
-    RECT borderRect = {};
-    AdjustWindowRectEx(&borderRect, dwStyle, 0, 0);
-
-    width += borderRect.right - borderRect.left;
-    height += borderRect.bottom - borderRect.top;
-
-    HWND window = CreateWindowExA(0, title, // Unique identifier again
-                                    title, dwStyle, 100, 100, width, height, NULL, NULL, instance, NULL);
-
-    QUARTZ_ASSERT(window != NULL, "Failed to create dummy window for OpenGL setup!");
-
-    HDC dc = GetDC(window);
-    QUARTZ_ASSERT(dc != NULL, "Failed to get DC!");
-
-    const int pixelAttribs [] = {
-        WGL_DRAW_TO_WINDOW_ARB, GL_TRUE,
-        WGL_SUPPORT_OPENGL_ARB, GL_TRUE,
-        WGL_DOUBLE_BUFFER_ARB, GL_TRUE,
-        WGL_SWAP_METHOD_ARB, WGL_SWAP_COPY_ARB,
-        WGL_PIXEL_TYPE_ARB, WGL_TYPE_RGBA_ARB,
-        WGL_ACCELERATION_ARB, WGL_FULL_ACCELERATION_ARB,
-        WGL_COLOR_BITS_ARB, 32,
-        WGL_ALPHA_BITS_ARB, 8,
-        WGL_DEPTH_BITS_ARB, 24,
-        0
-    };
-
-    UINT numPixelFormats;
-    int pixelFormat = 0;
-
-    QUARTZ_ASSERT(wglChoosePixelFormatARB(dc, pixelAttribs, 0, 1, &pixelFormat, &numPixelFormats),
-                  "Failed call to 'wglChoosePixelFormatARB'");
-
-    PIXELFORMATDESCRIPTOR pfd = {};
-    DescribePixelFormat(dc, pixelFormat, sizeof(PIXELFORMATDESCRIPTOR), &pfd);
-
-    QUARTZ_ASSERT(SetPixelFormat(dc, pixelFormat, &pfd), "Failed to SetPixelFormat");
-
-    const int contextAttribs [] = {
-        WGL_CONTEXT_MAJOR_VERSION_ARB, 4,
-        WGL_CONTEXT_MINOR_VERSION_ARB, 3,
-        WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
-        WGL_CONTEXT_FLAGS_ARB, WGL_CONTEXT_DEBUG_BIT_ARB,
-        0
-    };
-
-    HGLRC rc = wglCreateContextAttribsARB(dc, 0, contextAttribs);
-    QUARTZ_ASSERT(rc != NULL, "Failed to create opengl context!");
-    QUARTZ_ASSERT(wglMakeCurrent(dc, rc), "Failed to make current!");
-
-    ShowWindow(window, SW_SHOW);
-
-    context.running = true;
-    
-    context.window_width = width;
-    context.window_height = height;
-    context.win_window = window;
-    context.win_dc = dc;
-    context.win_rc = rc;
+    glDebugMessageCallback(&quartz_gl_debug_callback, nullptr);
+    glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
+    glEnable(GL_DEBUG_OUTPUT);
 }
 
 void quartz_update_events()
 {
-    MSG msg;
-
-    while(PeekMessageA(&msg, context.win_window, 0, 0, PM_REMOVE))
-    {
-        TranslateMessage(&msg);
-        DispatchMessage(&msg); // Sends message to the callback function of the window
-    }
+    quartz_window_update(&context.window);
 }
 
 void quartz_swap_buffers()
 {
-    SwapBuffers(context.win_dc);
+    quartz_window_swap_buffers(&context.window);
 }
-
-static LRESULT CALLBACK quartz_windows_window_callback(HWND window, UINT msg, WPARAM wParam, LPARAM lParam)
-{
-    LRESULT result = 0;
-
-    switch (msg)
-    {
-        case WM_CLOSE:
-            context.running = false;
-            break;
-        case WM_SIZE:
-        {
-            RECT rect;
-            GetClientRect(window, &rect);
-
-            int new_width = rect.right - rect.left;
-            int new_height = rect.bottom - rect.top;
-
-            context.window_width = new_width;
-            context.window_height = new_height;
-            
-            glViewport(0, 0, new_width, new_height);
-            break;
-        }
-        default:
-            result = DefWindowProcA(window, msg, wParam, lParam);
-            break;
-    }
-
-    return result;
-}
-
-#endif
 
 bool quartz_is_running()
 {
-    return context.running;
+    return context.window.running;
 }
 
 int quartz_get_screen_width()
 {
-    return context.window_width;
+    return context.window.width;
 }
 
 int quartz_get_screen_height()
 {
-    return context.window_height;
+    return context.window.height;
+}
+
+quartz_shader quartz_make_shader(const char* vs_code, const char* fs_code, bool use_now)
+{
+    GLuint vs_id = quartz_shader_from_source(GL_VERTEX_SHADER, vs_code);
+    GLuint fs_id = quartz_shader_from_source(GL_FRAGMENT_SHADER, fs_code);
+    return quartz_program_from_shaders(vs_id, fs_id, use_now);
+}
+
+void quartz_use_shader(quartz_shader shader)
+{
+    glUseProgram(shader);
 }
 
 quartz_texture quartz_load_texture(const char* path)
@@ -284,5 +146,29 @@ void quartz_compile_shader(GLuint shader_id)
     {
         glGetShaderInfoLog(shader_id, 2048, 0, shaderLog);
         QUARTZ_ASSERT(false, shaderLog);
+    }
+}
+
+static void APIENTRY quartz_gl_debug_callback(GLenum source, GLenum type, 
+                                GLuint id, GLenum severity,
+                                GLsizei length, const GLchar *message,
+                                const void *userParam)
+{
+    (void)source;
+    (void)type;
+    (void)id;
+    (void)length;
+    (void)userParam;
+
+    switch (severity)
+    {
+        case GL_DEBUG_SEVERITY_LOW:
+        case GL_DEBUG_SEVERITY_MEDIUM:
+        case GL_DEBUG_SEVERITY_HIGH:
+            QUARTZ_ASSERT(false, message);
+            break;
+        default:
+            QUARTZ_LOG_INFO((const char*)message);
+            break;
     }
 }

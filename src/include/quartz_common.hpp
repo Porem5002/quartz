@@ -13,6 +13,7 @@ struct quartz_texture_info
 };
 
 using quartz_texture = const quartz_texture_info*;
+using quartz_shader = GLuint;
 
 struct quartz_sprite
 {

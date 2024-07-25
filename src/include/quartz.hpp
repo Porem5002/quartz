@@ -14,6 +14,9 @@ bool quartz_is_running();
 int quartz_get_screen_width();
 int quartz_get_screen_height();
 
+quartz_shader quartz_make_shader(const char* vs_code, const char* fs_code, bool use_now);
+void quartz_use_shader(quartz_shader shader);
+
 quartz_texture quartz_load_texture(const char* path);
 void quartz_bind_texture(quartz_texture texture, GLuint slot);
 
