@@ -18,7 +18,7 @@ quartz_shader quartz_make_shader(const char* vs_code, const char* fs_code, bool 
 void quartz_use_shader(quartz_shader shader);
 
 quartz_texture quartz_load_texture(const char* path);
-void quartz_bind_texture(quartz_texture texture, GLuint slot);
+void quartz_bind_texture(quartz_texture texture, unsigned int slot);
 
 GLuint quartz_shader_from_source(GLenum shader_type, const char* shader_src);
 GLuint quartz_program_from_shaders(GLuint vs_id, GLuint fs_id, bool use_program_now);

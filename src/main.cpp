@@ -12,23 +12,27 @@
 
 
 static const char* vertex_shader = "#version 430 core\n"
-                                    "layout (location = 0) in vec2 vertexPos;\n"
-                                    "layout (location = 1) in vec2 texturePos;\n"
-                                    "layout (location = 0) out vec2 out_texturePos;\n"
+                                    "layout (location = 0) in vec2 v_vertexPos;\n"
+                                    "layout (location = 1) in vec2 v_texturePos;\n"
+                                    "layout (location = 2) in float v_textureIndex;\n"
+                                    "out vec2 f_texturePos;\n"
+                                    "out float f_textureIndex;\n"
                                     "uniform mat4 u_mvp;\n"
                                     "void main()\n"
                                     "{\n"
-                                        "out_texturePos = texturePos;\n"
-                                        "gl_Position = u_mvp * vec4(vertexPos, 0, 1.0);\n"
+                                        "f_texturePos = v_texturePos;\n"
+                                        "f_textureIndex = v_textureIndex;\n"
+                                        "gl_Position = u_mvp * vec4(v_vertexPos, 0, 1.0);\n"
                                     "}\n";
 
 static const char* frag_shader = "#version 430 core\n"
-                                "layout (location = 0) in vec2 texturePos;\n"
-                                "layout (binding = 0) uniform sampler2D u_Texture;\n"
+                                "in vec2 f_texturePos;\n"
+                                "in float f_textureIndex;\n"
+                                "uniform sampler2D u_textures [32];\n"
                                 "out vec4 fragColor;\n"
                                 "void main()\n"
                                 "{\n"
-                                    "fragColor = texelFetch(u_Texture, ivec2(texturePos), 0);\n"
+                                    "fragColor = texelFetch(u_textures[int(f_textureIndex)], ivec2(f_texturePos), 0);\n"
                                 "}\n";
 
 int main()
@@ -45,9 +49,19 @@ int main()
     cam.width = 320;
     cam.height = 180;
 
-    quartz_mat4 proj = quartz_camera2D_to_mat4(cam);
     GLuint u_mvp = glGetUniformLocation(shader, "u_mvp");
+    GLuint u_textures = glGetUniformLocation(shader, "u_textures");
+
+    quartz_mat4 proj = quartz_camera2D_to_mat4(cam);
     glUniformMatrix4fv(u_mvp, 1, GL_FALSE, &proj.values[0][0]);
+
+    // Assign all texture slots to shader
+    int samplers [32];
+
+    for(size_t i = 0; i < quartz_renderer::TEXTURE_SLOT_CAP; i++)
+        samplers[i] = (int)i;
+    
+    glUniform1iv(u_textures, 32, samplers);
 
     while(quartz_is_running())
     {

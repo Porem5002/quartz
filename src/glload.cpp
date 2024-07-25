@@ -5,6 +5,7 @@ static PFNGLCREATEPROGRAMPROC glCreateProgram_ptr;
 static PFNGLDELETETEXTURESPROC glDeleteTextures_ptr;
 static PFNGLGENTEXTURESPROC glGenTextures_ptr;
 static PFNGLBINDTEXTUREPROC glBindTexture_ptr;
+static PFNGLBINDTEXTUREUNITPROC glBindTextureUnit_ptr;
 static PFNGLDRAWBUFFERPROC glDrawBuffer_ptr;
 static PFNGLDRAWARRAYSPROC glDrawArrays_ptr;
 static PFNGLCREATESHADERPROC glCreateShader_ptr;
@@ -14,6 +15,7 @@ static PFNGLUNIFORM2FVPROC glUniform2fv_ptr;
 static PFNGLUNIFORM3FVPROC glUniform3fv_ptr;
 static PFNGLUNIFORM4FVPROC glUniform4fv_ptr;
 static PFNGLUNIFORM1IPROC glUniform1i_ptr;
+static PFNGLUNIFORM1IVPROC glUniform1iv_ptr;
 static PFNGLUNIFORMMATRIX4FVPROC glUniformMatrix4fv_ptr;
 static PFNGLVERTEXATTRIBDIVISORPROC glVertexAttribDivisor_ptr;
 static PFNGLACTIVETEXTUREPROC glActiveTexture_ptr;
@@ -64,6 +66,7 @@ void load_gl_functions()
     glDeleteTextures_ptr = (PFNGLDELETETEXTURESPROC)load_gl_function_by_name("glDeleteTextures");
     glGenTextures_ptr = (PFNGLGENTEXTURESPROC)load_gl_function_by_name("glGenTextures");
     glBindTexture_ptr = (PFNGLBINDTEXTUREPROC)load_gl_function_by_name("glBindTexture");
+    glBindTextureUnit_ptr = (PFNGLBINDTEXTUREUNITPROC)load_gl_function_by_name("glBindTextureUnit");
     glDrawArrays_ptr = (PFNGLDRAWARRAYSPROC)load_gl_function_by_name("glDrawArrays");
     glCreateShader_ptr = (PFNGLCREATESHADERPROC) load_gl_function_by_name("glCreateShader");
     glGetUniformLocation_ptr = (PFNGLGETUNIFORMLOCATIONPROC) load_gl_function_by_name("glGetUniformLocation");
@@ -72,6 +75,7 @@ void load_gl_functions()
     glUniform3fv_ptr = (PFNGLUNIFORM3FVPROC) load_gl_function_by_name("glUniform3fv");
     glUniform4fv_ptr = (PFNGLUNIFORM4FVPROC) load_gl_function_by_name("glUniform4fv");
     glUniform1i_ptr = (PFNGLUNIFORM1IPROC) load_gl_function_by_name("glUniform1i");
+    glUniform1iv_ptr = (PFNGLUNIFORM1IVPROC) load_gl_function_by_name("glUniform1iv");
     glUniformMatrix4fv_ptr = (PFNGLUNIFORMMATRIX4FVPROC) load_gl_function_by_name("glUniformMatrix4fv");
     glVertexAttribDivisor_ptr = (PFNGLVERTEXATTRIBDIVISORPROC) load_gl_function_by_name("glVertexAttribDivisor");
     glActiveTexture_ptr = (PFNGLACTIVETEXTUREPROC) load_gl_function_by_name("glActiveTexture");
@@ -171,6 +175,11 @@ GLAPI void APIENTRY glBindTexture (GLenum target, GLuint texture)
   glBindTexture_ptr(target, texture);
 }
 
+GLAPI void APIENTRY glBindTextureUnit(GLuint unit, GLuint texture)
+{
+  glBindTextureUnit_ptr(unit, texture);
+}
+
 void glDrawArrays(GLenum mode, GLint first, GLsizei count)
 {
     glDrawArrays_ptr(mode, first, count);
@@ -209,6 +218,11 @@ void glUniform4fv(GLint location, GLsizei count, const GLfloat* value)
 void glUniform1i(GLint location, GLint v0)
 {
     glUniform1i_ptr(location, v0);
+}
+
+GLAPI void APIENTRY glUniform1iv(GLint location, GLsizei count, const GLint* value)
+{
+    glUniform1iv_ptr(location, count, value);
 }
 
 void glUniformMatrix4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat* value)

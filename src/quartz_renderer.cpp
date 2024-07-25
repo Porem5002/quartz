@@ -8,6 +8,7 @@ struct quartz_vb_elem
 {
     quartz_vec2 pos;
     quartz_vec2 uvs;
+    float slot_index;
 };
 
 struct quartz_vb_unit
@@ -35,10 +36,15 @@ struct quartz_renderer
     quartz_vb_unit vbo [BATCH_CAP];
     quartz_ib_unit ibo [BATCH_CAP];
 
-    quartz_texture curr_texture;
+    static constexpr size_t TEXTURE_SLOT_CAP = 32;
+
+    size_t texture_slot_index;
+    quartz_texture texture_slots [TEXTURE_SLOT_CAP];
 };
 
 static quartz_renderer renderer;
+
+static unsigned int quartz_render_push_new_texture(quartz_texture texture);
 
 quartz_mat4 quartz_camera2D_to_mat4(quartz_camera2D camera)
 {
@@ -56,7 +62,7 @@ void quartz_render_init()
     glDisable(GL_MULTISAMPLE);
     
     renderer.batch_size = 0;
-    renderer.curr_texture = nullptr;
+    renderer.texture_slot_index = 0;
 
     glGenVertexArrays(1, &renderer.va_id);
     glBindVertexArray(renderer.va_id);
@@ -67,9 +73,11 @@ void quartz_render_init()
 
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
+    glEnableVertexAttribArray(2);
 
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(quartz_vb_elem), (const void*)offsetof(quartz_vb_elem, pos));
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(quartz_vb_elem), (const void*)offsetof(quartz_vb_elem, uvs));
+    glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(quartz_vb_elem), (const void*)offsetof(quartz_vb_elem, slot_index));
 }
 
 void quartz_render_clear(float r, float g, float b, float a)
@@ -78,29 +86,51 @@ void quartz_render_clear(float r, float g, float b, float a)
     glClear(GL_COLOR_BUFFER_BIT);
 }
 
-void quartz_render_texture(quartz_texture texture, quartz_vec2 pos)
+static unsigned int quartz_render_push_new_texture(quartz_texture texture)
 {
-    if(renderer.curr_texture == nullptr)
+    unsigned int slot;
+    bool found = false;
+
+    for (size_t i = 0; i < renderer.texture_slot_index; i++)
     {
-        renderer.curr_texture = texture;
-        quartz_bind_texture(texture, 0);
+        if(renderer.texture_slots[i] == texture)
+        {
+            slot = i;
+            found = true;
+            break;
+        }
     }
 
-    if(renderer.curr_texture != texture)
+    if(!found)
     {
-        quartz_render_draw();
-        renderer.curr_texture = texture;
-        quartz_bind_texture(texture, 0);
+        QUARTZ_ASSERT(renderer.texture_slot_index < renderer.TEXTURE_SLOT_CAP, "Texture slot index exceeds capacity");
+
+        if(renderer.texture_slot_index == renderer.TEXTURE_SLOT_CAP)
+            quartz_render_draw();
+
+        slot = renderer.texture_slot_index;
+
+        quartz_bind_texture(texture, slot);
+        
+        renderer.texture_slots[renderer.texture_slot_index] = texture;
+        renderer.texture_slot_index++;
     }
+
+    return slot;
+}
+
+void quartz_render_texture(quartz_texture texture, quartz_vec2 pos)
+{
+    unsigned int slot = quartz_render_push_new_texture(texture);
 
     if(renderer.batch_size == renderer.BATCH_CAP)
         quartz_render_draw();
 
     quartz_vb_unit vb_unit = {
-        quartz_vb_elem { { -0.5, -0.5 }, { 0, 0 } },
-        quartz_vb_elem { { 0.5, -0.5 } , { 1, 0 } },
-        quartz_vb_elem { { 0.5, 0.5 },   { 1, 1 } },
-        quartz_vb_elem { { -0.5, 0.5 },  { 0, 1 } },
+        quartz_vb_elem { { -0.5, -0.5 }, { 0, 0 }, (float)slot },
+        quartz_vb_elem { { 0.5, -0.5 } , { 1, 0 }, (float)slot },
+        quartz_vb_elem { { 0.5, 0.5 },   { 1, 1 }, (float)slot },
+        quartz_vb_elem { { -0.5, 0.5 },  { 0, 1 }, (float)slot },
     };
 
     for(size_t i = 0; i < 4; i++)
@@ -128,27 +158,16 @@ void quartz_render_texture(quartz_texture texture, quartz_vec2 pos)
 
 void quartz_render_sprite(quartz_sprite sprite, quartz_vec2 pos)
 {
-    if(renderer.curr_texture == nullptr)
-    {
-        renderer.curr_texture = sprite.atlas;
-        quartz_bind_texture(sprite.atlas, 0);
-    }
-
-    if(renderer.curr_texture != sprite.atlas)
-    {
-        quartz_render_draw();
-        renderer.curr_texture = sprite.atlas;
-        quartz_bind_texture(sprite.atlas, 0);
-    }
+    unsigned int slot = quartz_render_push_new_texture(sprite.atlas);
 
     if(renderer.batch_size == renderer.BATCH_CAP)
         quartz_render_draw();
 
     quartz_vb_unit vb_unit = {
-        quartz_vb_elem { { -0.5, -0.5 }, { 0, 0 } },
-        quartz_vb_elem { { 0.5, -0.5 } , { 1, 0 } },
-        quartz_vb_elem { { 0.5, 0.5 },   { 1, 1 } },
-        quartz_vb_elem { { -0.5, 0.5 },  { 0, 1 } },
+        quartz_vb_elem { { -0.5, -0.5 }, { 0, 0 }, (float)slot },
+        quartz_vb_elem { { 0.5, -0.5 } , { 1, 0 }, (float)slot },
+        quartz_vb_elem { { 0.5, 0.5 },   { 1, 1 }, (float)slot },
+        quartz_vb_elem { { -0.5, 0.5 },  { 0, 1 }, (float)slot },
     };
 
     for(size_t i = 0; i < 4; i++)

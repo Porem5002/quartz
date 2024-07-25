@@ -105,7 +105,7 @@ quartz_texture quartz_load_texture(const char* path)
     return texture;
 }
 
-void quartz_bind_texture(quartz_texture texture, GLuint slot)
+void quartz_bind_texture(quartz_texture texture, unsigned int slot)
 {
     glActiveTexture(GL_TEXTURE0 + slot);
     glBindTexture(GL_TEXTURE_2D, texture->id);
@@ -126,7 +126,19 @@ GLuint quartz_program_from_shaders(GLuint vs_id, GLuint fs_id, bool use_program_
     glAttachShader(id, fs_id);
     glLinkProgram(id);
 
-    // TODO: Error check link program
+    GLint linkStatus;
+    glGetProgramiv(id, GL_LINK_STATUS, &linkStatus);
+    
+    if(linkStatus == GL_FALSE)
+    {
+        GLint log_length;
+        glGetProgramiv(id, GL_INFO_LOG_LENGTH, &log_length);
+        
+        char* log_msg = (char*)alloca(log_length * sizeof(char));
+        glGetProgramInfoLog(id, log_length, &log_length, log_msg);
+        
+        QUARTZ_ASSERT(false, log_msg);
+    }
 
     if(use_program_now)
         glUseProgram(id);
