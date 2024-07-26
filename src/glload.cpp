@@ -180,42 +180,42 @@ GLAPI void APIENTRY glBindTextureUnit(GLuint unit, GLuint texture)
   glBindTextureUnit_ptr(unit, texture);
 }
 
-void glDrawArrays(GLenum mode, GLint first, GLsizei count)
+GLAPI void APIENTRY glDrawArrays(GLenum mode, GLint first, GLsizei count)
 {
     glDrawArrays_ptr(mode, first, count);
 }
 
-GLuint glCreateShader(GLenum shaderType)
+GLAPI GLuint APIENTRY glCreateShader(GLenum shaderType)
 {
     return glCreateShader_ptr(shaderType);
 }
 
-GLint glGetUniformLocation(GLuint program, const GLchar* name)
+GLAPI GLint APIENTRY glGetUniformLocation(GLuint program, const GLchar* name)
 {
     return glGetUniformLocation_ptr(program, name);
 }
 
-void glUniform1f(GLint location, GLfloat v0)
+GLAPI void APIENTRY glUniform1f(GLint location, GLfloat v0)
 {
     glUniform1f_ptr(location, v0);
 }
 
-void glUniform2fv(GLint location, GLsizei count, const GLfloat* value)
+GLAPI void APIENTRY glUniform2fv(GLint location, GLsizei count, const GLfloat* value)
 {
     glUniform2fv_ptr(location, count, value);
 }
 
-void glUniform3fv(GLint location, GLsizei count, const GLfloat* value)
+GLAPI void APIENTRY glUniform3fv(GLint location, GLsizei count, const GLfloat* value)
 {
     glUniform3fv_ptr(location, count, value);
 }
 
-void glUniform4fv(GLint location, GLsizei count, const GLfloat* value)
+GLAPI void APIENTRY glUniform4fv(GLint location, GLsizei count, const GLfloat* value)
 {
     glUniform4fv_ptr(location, count, value);
 }
 
-void glUniform1i(GLint location, GLint v0)
+GLAPI void APIENTRY glUniform1i(GLint location, GLint v0)
 {
     glUniform1i_ptr(location, v0);
 }
@@ -225,212 +225,212 @@ GLAPI void APIENTRY glUniform1iv(GLint location, GLsizei count, const GLint* val
     glUniform1iv_ptr(location, count, value);
 }
 
-void glUniformMatrix4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat* value)
+GLAPI void APIENTRY glUniformMatrix4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat* value)
 {
     glUniformMatrix4fv_ptr(location, count, transpose, value);
 }
 
-void glVertexAttribDivisor(GLuint index, GLuint divisor)
+GLAPI void APIENTRY glVertexAttribDivisor(GLuint index, GLuint divisor)
 {
     glVertexAttribDivisor_ptr(index, divisor);
 }
 
-void glActiveTexture(GLenum texture)
+GLAPI void APIENTRY glActiveTexture(GLenum texture)
 {
     glActiveTexture_ptr(texture);
 }
 
-void glBufferSubData(GLenum target, GLintptr offset, GLsizeiptr size, const void* data)
+GLAPI void APIENTRY glBufferSubData(GLenum target, GLintptr offset, GLsizeiptr size, const void* data)
 {
     glBufferSubData_ptr(target, offset, size, data);
 }
 
-void glDrawArraysInstanced(GLenum mode, GLint first, GLsizei count, GLsizei instanceCount)
+GLAPI void APIENTRY glDrawArraysInstanced(GLenum mode, GLint first, GLsizei count, GLsizei instanceCount)
 {
     glDrawArraysInstanced_ptr(mode, first, count, instanceCount);
 }
 
-void glBindFramebuffer(GLenum target, GLuint framebuffer)
+GLAPI void APIENTRY glBindFramebuffer(GLenum target, GLuint framebuffer)
 {
     glBindFramebuffer_ptr(target, framebuffer);
 }
 
-GLenum glCheckFramebufferStatus(GLenum target)
+GLAPI GLenum APIENTRY glCheckFramebufferStatus(GLenum target)
 {
     return glCheckFramebufferStatus_ptr(target);
 }
 
-void glGenFramebuffers(GLsizei n, GLuint* framebuffers)
+GLAPI void APIENTRY glGenFramebuffers(GLsizei n, GLuint* framebuffers)
 {
     glGenFramebuffers_ptr(n, framebuffers);
 }
 
-void glFramebufferTexture2D(GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level)
+GLAPI void APIENTRY glFramebufferTexture2D(GLenum target, GLenum attachment, GLenum textarget, GLuint texture, GLint level)
 {
     glFramebufferTexture2D_ptr(target, attachment, textarget, texture, level);
 }
 
-void glDrawBuffers(GLsizei n, const GLenum* bufs)
+GLAPI void APIENTRY glDrawBuffers(GLsizei n, const GLenum* bufs)
 {
     glDrawBuffers_ptr(n, bufs);
 }
 
-void glDeleteFramebuffers(GLsizei n, const GLuint* framebuffers)
+GLAPI void APIENTRY glDeleteFramebuffers(GLsizei n, const GLuint* framebuffers)
 {
     glDeleteFramebuffers_ptr(n, framebuffers);
 }
 
-void glBlendFunci(GLuint buf, GLenum src, GLenum dst)
+GLAPI void APIENTRY glBlendFunci(GLuint buf, GLenum src, GLenum dst)
 {
     glBlendFunci_ptr(buf, src, dst);
 }
 
-void glBlendEquation(GLenum mode)
+GLAPI void APIENTRY glBlendEquation(GLenum mode)
 {
     glBlendEquation_ptr(mode);
 }
 
-void glClearBufferfv(GLenum buffer, GLint drawbuffer, const GLfloat* value)
+GLAPI void APIENTRY glClearBufferfv(GLenum buffer, GLint drawbuffer, const GLfloat* value)
 {
     glClearBufferfv_ptr(buffer, drawbuffer, value);
 }
 
-void glShaderSource(GLuint shader, GLsizei count, const GLchar* const* strings, const GLint* lengths)
+GLAPI void APIENTRY glShaderSource(GLuint shader, GLsizei count, const GLchar* const* strings, const GLint* lengths)
 {
     glShaderSource_ptr(shader, count, strings, lengths);
 }
 
-void glCompileShader(GLuint shader)
+GLAPI void APIENTRY glCompileShader(GLuint shader)
 {
     glCompileShader_ptr(shader);
 }
 
-void glGetShaderiv(GLuint shader, GLenum pname, GLint* params)
+GLAPI void APIENTRY glGetShaderiv(GLuint shader, GLenum pname, GLint* params)
 {
     glGetShaderiv_ptr(shader, pname, params);
 }
 
-void glGetShaderInfoLog(GLuint shader, GLsizei bufSize, GLsizei* length, GLchar* infoLog)
+GLAPI void APIENTRY glGetShaderInfoLog(GLuint shader, GLsizei bufSize, GLsizei* length, GLchar* infoLog)
 {
     glGetShaderInfoLog_ptr(shader, bufSize, length, infoLog);
 }
 
-void glAttachShader(GLuint program, GLuint shader)
+GLAPI void APIENTRY glAttachShader(GLuint program, GLuint shader)
 {
     glAttachShader_ptr(program, shader);
 }
 
-void glLinkProgram(GLuint program)
+GLAPI void APIENTRY glLinkProgram(GLuint program)
 {
     glLinkProgram_ptr(program);
 }
 
-void glValidateProgram(GLuint program)
+GLAPI void APIENTRY glValidateProgram(GLuint program)
 {
     glValidateProgram_ptr(program);
 }
 
-void glGetProgramiv(GLuint program, GLenum pname, GLint* params)
+GLAPI void APIENTRY glGetProgramiv(GLuint program, GLenum pname, GLint* params)
 {
     glGetProgramiv_ptr(program, pname, params);
 }
 
-void glGetProgramInfoLog(GLuint program, GLsizei bufSize, GLsizei* length, GLchar* infoLog)
+GLAPI void APIENTRY glGetProgramInfoLog(GLuint program, GLsizei bufSize, GLsizei* length, GLchar* infoLog)
 {
     glGetProgramInfoLog_ptr(program, bufSize, length, infoLog);
 }
 
-void glGenBuffers(GLsizei n, GLuint* buffers)
+GLAPI void APIENTRY glGenBuffers(GLsizei n, GLuint* buffers)
 {
     glGenBuffers_ptr(n, buffers);
 }
 
-void glGenVertexArrays(GLsizei n, GLuint* arrays)
+GLAPI void APIENTRY glGenVertexArrays(GLsizei n, GLuint* arrays)
 {
     glGenVertexArrays_ptr(n, arrays);
 }
 
-GLint glGetAttribLocation(GLuint program, const GLchar* name)
+GLAPI GLint APIENTRY glGetAttribLocation(GLuint program, const GLchar* name)
 {
     return glGetAttribLocation_ptr(program, name);
 }
 
-void glBindVertexArray(GLuint array)
+GLAPI void APIENTRY glBindVertexArray(GLuint array)
 {
     glBindVertexArray_ptr(array);
 }
 
-void glEnableVertexAttribArray(GLuint index)
+GLAPI void APIENTRY glEnableVertexAttribArray(GLuint index)
 {
     glEnableVertexAttribArray_ptr(index);
 }
 
-void glVertexAttribPointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const void* pointer)
+GLAPI void APIENTRY glVertexAttribPointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const void* pointer)
 {
     glVertexAttribPointer_ptr(index, size, type, normalized, stride, pointer);
 }
 
-void glBindBuffer(GLenum target, GLuint buffer)
+GLAPI void APIENTRY glBindBuffer(GLenum target, GLuint buffer)
 {
     glBindBuffer_ptr(target, buffer);
 }
 
-void glBindBufferBase(GLenum target, GLuint index, GLuint buffer)
+GLAPI void APIENTRY glBindBufferBase(GLenum target, GLuint index, GLuint buffer)
 {
     glBindBufferBase_ptr(target, index, buffer);
 }
 
-void glBufferData(GLenum target, GLsizeiptr size, const void* data, GLenum usage)
+GLAPI void APIENTRY glBufferData(GLenum target, GLsizeiptr size, const void* data, GLenum usage)
 {
     glBufferData_ptr(target, size, data, usage);
 }
 
-void glGetVertexAttribPointerv(GLuint index, GLenum pname, void** pointer)
+GLAPI void APIENTRY glGetVertexAttribPointerv(GLuint index, GLenum pname, void** pointer)
 {
     glGetVertexAttribPointerv_ptr(index, pname, pointer);
 }
 
-void glUseProgram(GLuint program)
+GLAPI void APIENTRY glUseProgram(GLuint program)
 {
     glUseProgram_ptr(program);
 }
 
-void glDeleteVertexArrays(GLsizei n, const GLuint* arrays)
+GLAPI void APIENTRY glDeleteVertexArrays(GLsizei n, const GLuint* arrays)
 {
     glDeleteVertexArrays_ptr(n, arrays);
 }
 
-void glDeleteBuffers(GLsizei n, const GLuint* buffers)
+GLAPI void APIENTRY glDeleteBuffers(GLsizei n, const GLuint* buffers)
 {
     glDeleteBuffers_ptr(n, buffers);
 }
 
-void glDeleteProgram(GLuint program)
+GLAPI void APIENTRY glDeleteProgram(GLuint program)
 {
     glDeleteProgram_ptr(program);
 }
 
-void glDetachShader (GLuint program, GLuint shader)
+GLAPI void APIENTRY glDetachShader (GLuint program, GLuint shader)
 {
     glDetachShader_ptr(program, shader);
 }
 
-void glDeleteShader(GLuint shader)
+GLAPI void APIENTRY glDeleteShader(GLuint shader)
 {
     glDeleteShader_ptr(shader);
 }
 
-void glDrawElementsInstanced(GLenum mode, GLsizei count, GLenum type, const void* indices, GLsizei instancecount)
+GLAPI void APIENTRY glDrawElementsInstanced(GLenum mode, GLsizei count, GLenum type, const void* indices, GLsizei instancecount)
 {
     glDrawElementsInstanced_ptr(mode, count, type, indices, instancecount);
 }
 
-void glGenerateMipmap(GLenum target)
+GLAPI void APIENTRY glGenerateMipmap(GLenum target)
 {
     glGenerateMipmap_ptr(target);
 }
 
-void glDebugMessageCallback (GLDEBUGPROC callback, const void *userParam)
+GLAPI void APIENTRY glDebugMessageCallback (GLDEBUGPROC callback, const void *userParam)
 {
   glDebugMessageCallback_ptr(callback, userParam);
 }
