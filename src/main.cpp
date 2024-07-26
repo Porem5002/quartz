@@ -8,6 +8,7 @@
 #include "quartz_math.cpp"
 #include "quartz_renderer.cpp"
 #include "quartz_window.cpp"
+#include "quartz_input.cpp"
 #include "glload.cpp"
 
 
@@ -63,20 +64,22 @@ int main()
     
     glUniform1iv(u_textures, 32, samplers);
 
+    quartz_sprite dice = { texture1, {16, 0}, {15, 16} };
+    quartz_sprite tomatoes = { texture2, {388, 777}, {411 - 388, 797 - 777} };
+
+    bool selector = true;
+
     while(quartz_is_running())
     {
         quartz_update_events();
 
         quartz_render_clear(0.2, 0.2, 0.23, 1.0);
 
-        quartz_sprite dice = { texture1, {16, 0}, {15, 16} };
-        quartz_sprite tomatoes = { texture2, {388, 777}, {411 - 388, 797 - 777} };
+        if(quartz_is_key_down(QUARTZ_KEY_L_MOUSE_BTN))
+            selector = !selector;
 
         for(size_t i = 0; i < 15; i++)
-            quartz_render_sprite(dice, {(float)(i * tomatoes.size.x) - 100, 0});
-
-        for(size_t i = 0; i < 15; i++)
-            quartz_render_sprite(tomatoes, {(float)(i * tomatoes.size.x) - 100, 20});
+            quartz_render_sprite(selector ? dice : tomatoes, {(float)(i * tomatoes.size.x) - 100, 0});
         
         quartz_render_draw();
 

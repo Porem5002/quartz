@@ -1,9 +1,11 @@
 #include <stb_image.h>
+#include <malloc.h>
 
 #include "include/quartz.hpp"
 #include "include/glload.hpp"
 #include "include/glinclude.hpp"
 #include "include/quartz_window.hpp"
+#include "include/quartz_input.hpp"
 
 struct quartz_context
 {
@@ -35,6 +37,7 @@ void quartz_start(int width, int height, const char* title)
 
 void quartz_update_events()
 {
+    quartz_update_key_states();
     quartz_window_update(&context.window);
 }
 
@@ -129,14 +132,15 @@ GLuint quartz_program_from_shaders(GLuint vs_id, GLuint fs_id, bool use_program_
     GLint linkStatus;
     glGetProgramiv(id, GL_LINK_STATUS, &linkStatus);
     
+    //TODO: Improve error logging
     if(linkStatus == GL_FALSE)
     {
         GLint log_length;
         glGetProgramiv(id, GL_INFO_LOG_LENGTH, &log_length);
-        
-        char* log_msg = (char*)alloca(log_length * sizeof(char));
+
+        char* log_msg = (char*)malloc(log_length * sizeof(char));
         glGetProgramInfoLog(id, log_length, &log_length, log_msg);
-        
+
         QUARTZ_ASSERT(false, log_msg);
     }
 

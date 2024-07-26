@@ -1,12 +1,14 @@
 #include "include/glload.hpp"
 #include "include/quartz_common.hpp"
 #include "include/quartz_window.hpp"
+#include "include/quartz_input.hpp"
 
 #ifdef _WIN32
 
 static quartz_window* curr_active_window;
 
 static LRESULT CALLBACK quartz_windows_window_callback(HWND window, UINT msg, WPARAM wParam, LPARAM lParam);
+static quartz_keycode quartz_windows_map_key(WPARAM virtual_key);
 
 quartz_window quartz_window_create(unsigned int width, unsigned int height, const char* title)
 {
@@ -185,12 +187,49 @@ static LRESULT CALLBACK quartz_windows_window_callback(HWND window, UINT msg, WP
             glViewport(0, 0, new_width, new_height);
             break;
         }
+        case WM_LBUTTONDOWN:
+        case WM_LBUTTONUP:
+            quartz_register_key(QUARTZ_KEY_L_MOUSE_BTN, msg == WM_LBUTTONUP);
+            break;
+        case WM_RBUTTONDOWN:
+        case WM_RBUTTONUP:
+            quartz_register_key(QUARTZ_KEY_R_MOUSE_BTN, msg == WM_RBUTTONUP);
+            break;
+        case WM_MBUTTONDOWN:
+        case WM_MBUTTONUP:
+            quartz_register_key(QUARTZ_KEY_M_MOUSE_BTN, msg == WM_MBUTTONUP);
+            break;
+        case WM_KEYDOWN:
+        case WM_KEYUP:
+        {
+            quartz_keycode key = quartz_windows_map_key(wParam);
+            quartz_register_key(key, msg == WM_KEYUP);
+            break;
+        }
         default:
             result = DefWindowProcA(window, msg, wParam, lParam);
             break;
     }
 
     return result;
+}
+
+static quartz_keycode quartz_windows_map_key(WPARAM virtual_key)
+{
+    if(virtual_key >= 0x30 && virtual_key <= 0x39)
+        return (quartz_keycode)(QUARTZ_KEY_0 + (virtual_key - 0x30));
+
+    if(virtual_key >= 0x41 && virtual_key <= 0x5A)
+        return (quartz_keycode)(QUARTZ_KEY_A + (virtual_key - 0x41));
+
+    if(virtual_key >= VK_NUMPAD0 && virtual_key <= VK_NUMPAD9)
+        return (quartz_keycode)(QUARTZ_KEY_NUMPAD_0 + (virtual_key - VK_NUMPAD0));
+
+    if(virtual_key == VK_BACK) return QUARTZ_KEY_BACK;
+    if(virtual_key == VK_TAB) return QUARTZ_KEY_TAB;
+    if(virtual_key == VK_SPACE) return QUARTZ_KEY_SPACE;
+
+    return QUARTZ_KEY_NONE;
 }
 
 #endif
