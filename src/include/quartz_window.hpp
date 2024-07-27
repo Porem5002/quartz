@@ -4,10 +4,15 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
+#include <cstdint>
+
+#include "quartz_math.hpp"
+
 struct quartz_window
 {
     bool running;
-    unsigned int width, height;
+    quartz_uvec2 size;
+    quartz_uvec2 mouse_pos;
 
     #if _WIN32
         HWND win_window;

@@ -75,11 +75,13 @@ int main()
 
         quartz_render_clear(0.2, 0.2, 0.23, 1.0);
 
+        quartz_uvec2 screen_mouse_pos = quartz_get_mouse_pos();
+        quartz_vec2 mouse_pos = quartz_screen_to_world2D(cam, screen_mouse_pos);
+
         if(quartz_is_key_down(QUARTZ_KEY_L_MOUSE_BTN))
             selector = !selector;
 
-        for(size_t i = 0; i < 15; i++)
-            quartz_render_sprite(selector ? dice : tomatoes, {(float)(i * tomatoes.size.x) - 100, 0});
+        quartz_render_sprite(selector ? dice : tomatoes, mouse_pos);
         
         quartz_render_draw();
 

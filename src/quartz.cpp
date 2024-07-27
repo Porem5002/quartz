@@ -51,14 +51,14 @@ bool quartz_is_running()
     return context.window.running;
 }
 
-int quartz_get_screen_width()
+quartz_uvec2 quartz_get_screen_size()
 {
-    return context.window.width;
+    return context.window.size;
 }
 
-int quartz_get_screen_height()
+quartz_uvec2 quartz_get_mouse_pos()
 {
-    return context.window.height;
+    return context.window.mouse_pos;
 }
 
 quartz_shader quartz_make_shader(const char* vs_code, const char* fs_code, bool use_now)

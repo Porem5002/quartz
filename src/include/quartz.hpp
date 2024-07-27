@@ -2,6 +2,7 @@
 #define QUARTZ_ENGINE_HEADER
 
 #include <cstdlib>
+#include <cstdint>
 
 #include "glinclude.hpp"
 #include "quartz_common.hpp"
@@ -11,8 +12,8 @@ void quartz_update_events();
 void quartz_swap_buffers();
 
 bool quartz_is_running();
-int quartz_get_screen_width();
-int quartz_get_screen_height();
+quartz_uvec2 quartz_get_screen_size();
+quartz_uvec2 quartz_get_mouse_pos();
 
 quartz_shader quartz_make_shader(const char* vs_code, const char* fs_code, bool use_now);
 void quartz_use_shader(quartz_shader shader);

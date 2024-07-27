@@ -13,6 +13,7 @@ struct quartz_camera2D
 };
 
 quartz_mat4 quartz_camera2D_to_mat4(quartz_camera2D camera);
+quartz_vec2 quartz_screen_to_world2D(quartz_camera2D camera, quartz_uvec2 position);
 
 void quartz_render_init();
 void quartz_render_clear(float r, float g, float b, float a);

@@ -55,6 +55,17 @@ quartz_mat4 quartz_camera2D_to_mat4(quartz_camera2D camera)
                             -1.0, 1.0);
 }
 
+quartz_vec2 quartz_screen_to_world2D(quartz_camera2D camera, quartz_uvec2 position)
+{
+    float norm_x = (float)position.x / (float)quartz_get_screen_size().x - 0.5f;
+    float norm_y = (float)position.y / (float)quartz_get_screen_size().y - 0.5f;
+
+    float world_x = camera.x + norm_x * camera.width;
+    float world_y = camera.y + norm_y * camera.height;
+
+    return quartz_vec2 { world_x, world_y };
+}
+
 void quartz_render_init()
 {
     glEnable(GL_BLEND);
