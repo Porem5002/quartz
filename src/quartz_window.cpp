@@ -24,9 +24,6 @@ quartz_window quartz_window_create(unsigned int width, unsigned int height, cons
     QUARTZ_ASSERT(RegisterClassA(&wc), "Failed on call to RegisterClassA during window creation");
 
     int dwStyle = WS_OVERLAPPEDWINDOW;
-    
-    PFNWGLCHOOSEPIXELFORMATARBPROC wglChoosePixelFormatARB;
-    PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB;
 
     // Generate temporary window, dc and rc so that we can extract special OPenGL functions 
     {
@@ -58,8 +55,7 @@ quartz_window quartz_window_create(unsigned int width, unsigned int height, cons
         QUARTZ_ASSERT(q_window.win_rc != NULL, "Failed to create opengl context!");
         QUARTZ_ASSERT(wglMakeCurrent(q_window.win_dc, q_window.win_rc) != 0, "Failed to make current!");
 
-        wglChoosePixelFormatARB = (PFNWGLCHOOSEPIXELFORMATARBPROC)load_gl_function_by_name("wglChoosePixelFormatARB");
-        wglCreateContextAttribsARB = (PFNWGLCREATECONTEXTATTRIBSARBPROC)load_gl_function_by_name("wglCreateContextAttribsARB");
+        load_wgl_functions();
 
         // Cleanup temporary contexts
         wglMakeCurrent(q_window.win_dc, 0);

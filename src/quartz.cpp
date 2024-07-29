@@ -1,5 +1,8 @@
-#include <stb_image.h>
+
+#include <chrono>
 #include <malloc.h>
+
+#include <stb_image.h>
 
 #include "include/quartz.hpp"
 #include "include/glload.hpp"
@@ -10,6 +13,8 @@
 struct quartz_context
 {
     static constexpr size_t TEXTURE_CAP = 10;
+
+    float delta_time;
 
     size_t textures_size;
     quartz_texture_info textures [TEXTURE_CAP];
@@ -33,12 +38,27 @@ void quartz_start(int width, int height, const char* title)
     glDebugMessageCallback(&quartz_gl_debug_callback, nullptr);
     glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
     glEnable(GL_DEBUG_OUTPUT);
+
+    // Default Config
+    quartz_set_vsync(true);
 }
 
+// TODO: Give a more fitting name
 void quartz_update_events()
 {
+    static auto last_time = std::chrono::system_clock::now();
+    auto curr_time = std::chrono::system_clock::now();
+    
+    context.delta_time = std::chrono::duration<float>(curr_time - last_time).count();
+    last_time = curr_time;
+
     quartz_update_key_states();
     quartz_window_update(&context.window);
+}
+
+void quartz_set_vsync(bool active)
+{
+    wglSwapIntervalEXT((int)active);
 }
 
 void quartz_swap_buffers()
@@ -49,6 +69,11 @@ void quartz_swap_buffers()
 bool quartz_is_running()
 {
     return context.window.running;
+}
+
+float quartz_get_delta_time()
+{
+    return context.delta_time;
 }
 
 quartz_uvec2 quartz_get_screen_size()

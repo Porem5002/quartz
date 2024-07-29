@@ -121,6 +121,17 @@ void load_gl_functions()
     glGetIntegerv_ptr = (PFNGLGETINTEGERVPROC)load_gl_function_by_name("glGetIntegerv");
 }
 
+static PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB_ptr;
+static PFNWGLCHOOSEPIXELFORMATARBPROC wglChoosePixelFormatARB_ptr;
+static PFNWGLSWAPINTERVALEXTPROC wglSwapIntervalEXT_ptr;
+
+void load_wgl_functions()
+{
+    wglCreateContextAttribsARB_ptr = (PFNWGLCREATECONTEXTATTRIBSARBPROC)load_gl_function_by_name("wglCreateContextAttribsARB");
+    wglChoosePixelFormatARB_ptr = (PFNWGLCHOOSEPIXELFORMATARBPROC)load_gl_function_by_name("wglChoosePixelFormatARB");
+    wglSwapIntervalEXT_ptr = (PFNWGLSWAPINTERVALEXTPROC)load_gl_function_by_name("wglSwapIntervalEXT");
+}
+
 any_func_ptr load_gl_function_by_name(const char* func_name)
 {
     PROC proc1 = wglGetProcAddress(func_name);
@@ -438,4 +449,19 @@ GLAPI void APIENTRY glDebugMessageCallback (GLDEBUGPROC callback, const void *us
 GLAPI void APIENTRY glGetIntegerv(GLenum pname, GLint *data)
 {
     glGetIntegerv_ptr(pname, data);
+}
+
+HGLRC WINAPI wglCreateContextAttribsARB(HDC hDC, HGLRC hShareContext, const int *attribList)
+{
+    return wglCreateContextAttribsARB_ptr(hDC, hShareContext, attribList);
+}
+
+BOOL WINAPI wglChoosePixelFormatARB(HDC hdc, const int *piAttribIList, const FLOAT *pfAttribFList, UINT nMaxFormats, int *piFormats, UINT *nNumFormats)
+{
+    return wglChoosePixelFormatARB_ptr(hdc, piAttribIList, pfAttribFList, nMaxFormats, piFormats, nNumFormats);
+}
+
+BOOL WINAPI wglSwapIntervalEXT(int interval)
+{
+    return wglSwapIntervalEXT_ptr(interval);
 }

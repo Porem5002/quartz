@@ -8,6 +8,8 @@
 
 #define GL_GLEXT_PROTOTYPES
 #include <glcorearb.h>
+
+#define WGL_WGLEXT_PROTOTYPES
 #include <wglext.h>
 
 #endif

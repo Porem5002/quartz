@@ -73,6 +73,8 @@ int main()
     {
         quartz_update_events();
 
+        printf("FPS: %f\n", 1.0f / quartz_get_delta_time());
+
         quartz_render_clear(0.2, 0.2, 0.23, 1.0);
 
         quartz_uvec2 screen_mouse_pos = quartz_get_mouse_pos();

@@ -9,9 +9,11 @@
 
 void quartz_start(int width, int height, const char* title);
 void quartz_update_events();
+void quartz_set_vsync(bool active);
 void quartz_swap_buffers();
 
 bool quartz_is_running();
+float quartz_get_delta_time();
 quartz_uvec2 quartz_get_screen_size();
 quartz_uvec2 quartz_get_mouse_pos();
 
