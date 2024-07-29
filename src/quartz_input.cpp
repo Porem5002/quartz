@@ -24,8 +24,10 @@ void quartz_update_key_states()
             key_states[i].up = false;
             key_states[i].pressed = false;
         }
-    }
-    
+
+        // FIXME: If the user moves the window while a key is down and if during the movement the key is released,
+        // then the up event won't be detected so we should check manually here using GetKeyState()
+    }   
 }
 
 void quartz_register_key(quartz_keycode key, bool up)
