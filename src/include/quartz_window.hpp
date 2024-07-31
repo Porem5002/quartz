@@ -11,6 +11,7 @@
 struct quartz_window
 {
     bool running;
+    bool resized;
     quartz_uvec2 size;
     quartz_uvec2 mouse_pos;
 

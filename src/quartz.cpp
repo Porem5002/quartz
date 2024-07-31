@@ -41,6 +41,7 @@ void quartz_start(int width, int height, const char* title)
 
     // Default Config
     quartz_set_vsync(true);
+    glViewport(0, 0, width, height);
 }
 
 // TODO: Give a more fitting name
@@ -76,6 +77,11 @@ float quartz_get_delta_time()
     return context.delta_time;
 }
 
+bool quartz_was_screen_resized()
+{
+    return context.window.resized;
+}
+
 quartz_uvec2 quartz_get_screen_size()
 {
     return context.window.size;
@@ -86,11 +92,11 @@ quartz_uvec2 quartz_get_mouse_pos()
     return context.window.mouse_pos;
 }
 
-quartz_shader quartz_make_shader(const char* vs_code, const char* fs_code, bool use_now)
+quartz_shader quartz_make_shader(const char* vs_code, const char* fs_code)
 {
     GLuint vs_id = quartz_shader_from_source(GL_VERTEX_SHADER, vs_code);
     GLuint fs_id = quartz_shader_from_source(GL_FRAGMENT_SHADER, fs_code);
-    GLuint prog_id = quartz_program_from_shaders(vs_id, fs_id, use_now);
+    GLuint prog_id = quartz_program_from_shaders(vs_id, fs_id);
     glValidateProgram(prog_id);
     return prog_id;
 }
@@ -149,7 +155,7 @@ GLuint quartz_shader_from_source(GLenum shader_type, const char* shader_src)
     return id;
 }
 
-GLuint quartz_program_from_shaders(GLuint vs_id, GLuint fs_id, bool use_program_now)
+GLuint quartz_program_from_shaders(GLuint vs_id, GLuint fs_id)
 {
     GLuint id = glCreateProgram();
     glAttachShader(id, vs_id);
@@ -170,9 +176,6 @@ GLuint quartz_program_from_shaders(GLuint vs_id, GLuint fs_id, bool use_program_
 
         QUARTZ_ASSERT(false, log_msg);
     }
-
-    if(use_program_now)
-        glUseProgram(id);
 
     return id;
 }

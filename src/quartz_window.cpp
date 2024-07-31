@@ -127,6 +127,7 @@ void quartz_window_update(quartz_window* window)
     MSG msg;
 
     curr_active_window = window;
+    curr_active_window->resized = false;
 
     while(PeekMessageA(&msg, window->win_window, 0, 0, PM_REMOVE))
     {
@@ -159,9 +160,6 @@ static LRESULT CALLBACK quartz_windows_window_callback(HWND window, UINT msg, WP
             auto height = (unsigned)(rect.bottom - rect.top);
 
             curr_active_window->size = { width, height };
-            
-            glViewport(0, 0, width, height);
-
             curr_active_window->running = true;
             break;
         }
@@ -177,8 +175,8 @@ static LRESULT CALLBACK quartz_windows_window_callback(HWND window, UINT msg, WP
             auto new_height = (unsigned)(rect.bottom - rect.top);
 
             curr_active_window->size = { new_width, new_height };
+            curr_active_window->resized = true;
 
-            glViewport(0, 0, new_width, new_height);
             break;
         }
         case WM_MOUSEMOVE:
