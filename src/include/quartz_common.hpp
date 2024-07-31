@@ -2,6 +2,7 @@
 #define QUARTZ_INTERNALS_HEADER
 
 #include <cstdio>
+#include <cstdint>
 
 #include "glinclude.hpp"
 #include "quartz_math.hpp"
@@ -21,6 +22,19 @@ struct quartz_sprite
     quartz_uvec2 offset;
     quartz_uvec2 size;
 };
+
+struct quartz_color
+{
+    float r, g, b, a;
+};
+
+constexpr quartz_color QUARTZ_TRANSPARENT = { 0.0f, 0.0f, 0.0f, 0.0f };
+constexpr quartz_color QUARTZ_BLACK = { 0.0f, 0.0f, 0.0f, 1.0f };
+constexpr quartz_color QUARTZ_WHITE = { 1.0f, 1.0f, 1.0f, 1.0f };
+
+constexpr quartz_color QUARTZ_RED = { 1.0f, 0.0f, 0.0f, 1.0f };
+constexpr quartz_color QUARTZ_GREEN = { 0.0f, 1.0f, 0.0f, 1.0f };
+constexpr quartz_color QUARTZ_BLUE = { 0.0f, 0.0f, 1.0f, 1.0f };
 
 #define QUARTZ_DEBUG_BREAK() __debugbreak()
 

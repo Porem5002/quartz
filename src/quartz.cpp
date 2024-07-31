@@ -90,7 +90,9 @@ quartz_shader quartz_make_shader(const char* vs_code, const char* fs_code, bool 
 {
     GLuint vs_id = quartz_shader_from_source(GL_VERTEX_SHADER, vs_code);
     GLuint fs_id = quartz_shader_from_source(GL_FRAGMENT_SHADER, fs_code);
-    return quartz_program_from_shaders(vs_id, fs_id, use_now);
+    GLuint prog_id = quartz_program_from_shaders(vs_id, fs_id, use_now);
+    glValidateProgram(prog_id);
+    return prog_id;
 }
 
 void quartz_use_shader(quartz_shader shader)
@@ -205,6 +207,9 @@ static void APIENTRY quartz_gl_debug_callback(GLenum source, GLenum type,
     {
         case GL_DEBUG_SEVERITY_LOW:
         case GL_DEBUG_SEVERITY_MEDIUM:
+            //TODO: Check why renderer causes shader recompilation on the first call to glClear, triggering this
+            QUARTZ_LOG_INFO((const char*)message);
+            break;
         case GL_DEBUG_SEVERITY_HIGH:
             QUARTZ_ASSERT(false, message);
             break;
