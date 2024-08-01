@@ -10,7 +10,7 @@ static quartz_window* curr_active_window;
 static LRESULT CALLBACK quartz_windows_window_callback(HWND window, UINT msg, WPARAM wParam, LPARAM lParam);
 static quartz_keycode quartz_windows_map_key(WPARAM virtual_key);
 
-quartz_window quartz_window_create(unsigned int width, unsigned int height, const char* title)
+quartz_window quartz_window_create(int width, int height, const char* title)
 {
     HINSTANCE instance = GetModuleHandleA(0);
 
@@ -23,7 +23,7 @@ quartz_window quartz_window_create(unsigned int width, unsigned int height, cons
 
     QUARTZ_ASSERT(RegisterClassA(&wc), "Failed on call to RegisterClassA during window creation");
 
-    int dwStyle = WS_OVERLAPPEDWINDOW;
+    DWORD dwStyle = WS_OVERLAPPEDWINDOW;
 
     // Generate temporary window, dc and rc so that we can extract special OPenGL functions 
     {
@@ -70,8 +70,8 @@ quartz_window quartz_window_create(unsigned int width, unsigned int height, cons
     RECT borderRect = {};
     AdjustWindowRectEx(&borderRect, dwStyle, 0, 0);
 
-    width += borderRect.right - borderRect.left;
-    height += borderRect.bottom - borderRect.top;
+    width += (int)(borderRect.right - borderRect.left);
+    height += (int)(borderRect.bottom - borderRect.top);
 
     window.win_window = CreateWindowExA(0, title, // Unique identifier again
                                     title, dwStyle, 100, 100, width, height, NULL, NULL, instance, NULL);

@@ -22,7 +22,7 @@ struct quartz_window
     #endif
 };
 
-quartz_window quartz_window_create(unsigned int width, unsigned int height, const char* title);
+quartz_window quartz_window_create(int width, int height, const char* title);
 void quartz_window_update(quartz_window* window);
 void quartz_window_swap_buffers(quartz_window* window);
 
