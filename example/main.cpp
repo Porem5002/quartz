@@ -10,36 +10,36 @@
 #include <quartz_window.cpp>
 #include <quartz_input.cpp>
 #include <glload.cpp>
+#include <quartz_viewport.cpp>
 
 #define GAME_WIDTH 320
 #define GAME_HEIGHT 180
 
 int main()
 {
-    quartz_start(1200, 720, "My Window");
+    quartz_start(1280, 720, "My Window");
 
     quartz_texture texture1 = quartz_load_texture("assets/TEXTURE_ATLAS.png");
     quartz_texture texture2 = quartz_load_texture("assets/terrain_atlas.png");
 
     quartz_render_init();
 
-    float zoom_x = (float)quartz_get_screen_size().x  / (float)GAME_WIDTH;
-    float zoom_y = (float)quartz_get_screen_size().y  / (float)GAME_HEIGHT;
-    float zoom = min(zoom_x, zoom_y);
+    auto screen_viewport = quartz_get_screen_viewport();
 
     quartz_camera2D cam = {};
-    cam.width = quartz_get_screen_size().x;
-    cam.height = quartz_get_screen_size().y;
-    cam.zoom = zoom;
+    cam.width = GAME_WIDTH;
+    cam.height = GAME_HEIGHT;
+    cam.zoom = 1.0f;
 
-    quartz_mat4 proj = quartz_camera2D_to_mat4(cam);
-    quartz_render_set_mvp(proj);
+    quartz_mat4 cam_proj = quartz_camera2D_to_mat4(cam);
+    quartz_render_set_mvp(cam_proj);
+
+    quartz_viewport viewport = quartz_viewport_boxed(screen_viewport, GAME_WIDTH, GAME_HEIGHT);
+    quartz_set_viewport(viewport);
 
     quartz_sprite pixel = { texture1, {0, 0}, {1, 1} };
     quartz_sprite dice = { texture1, {16, 0}, {15, 16} };
     quartz_sprite tomatoes = { texture2, {388, 777}, {411 - 388, 797 - 777} };
-
-    bool selector = true;
 
     while(quartz_is_running())
     {
@@ -47,39 +47,20 @@ int main()
 
         if(quartz_was_screen_resized())
         {
-            auto screen_size = quartz_get_screen_size();
-
-            float zoom_x = (float)screen_size.x  / (float)GAME_WIDTH;
-            float zoom_y = (float)screen_size.y  / (float)GAME_HEIGHT;
-            float zoom = min(zoom_x, zoom_y);
-
-            cam.width = screen_size.x;
-            cam.height = screen_size.y;
-            cam.zoom = zoom;
-            
-            quartz_mat4 proj = quartz_camera2D_to_mat4(cam);
-            quartz_render_set_mvp(proj);
-            
-            glViewport(0, 0, screen_size.x, screen_size.y);
+            screen_viewport = quartz_get_screen_viewport();
+            viewport = quartz_viewport_boxed(screen_viewport, GAME_WIDTH, GAME_HEIGHT);
+            quartz_set_viewport(viewport);
         }
 
-        printf("FPS: %f\n", 1.0f / quartz_get_delta_time());
+        quartz_ivec2 screen_mouse_pos = quartz_get_mouse_pos();
+        quartz_vec2 mouse_pos = quartz_viewport_to_world2D(cam, screen_mouse_pos, viewport);
 
-        quartz_render_clear(0.2, 0.2, 0.23, 1.0);
+        quartz_color bg_color = {0.2, 0.2, 0.23, 1.0}; 
 
-        quartz_uvec2 screen_mouse_pos = quartz_get_mouse_pos();
-        quartz_vec2 mouse_pos = quartz_screen_to_world2D(cam, screen_mouse_pos);
-
-        if(quartz_is_key_down(QUARTZ_KEY_L_MOUSE_BTN))
-            selector = !selector;
-
-        static float rot = 0.0f;
+        quartz_render_clear(0.0, 0.0, 0.0, 1.0);
         
-        if(quartz_is_key_down(QUARTZ_KEY_R) || quartz_is_key_held(QUARTZ_KEY_R))
-            rot += 5 * quartz_get_delta_time();
-        
-        quartz_render_sprite(selector ? dice : tomatoes, mouse_pos, {1.0f, 1.0f}, rot, QUARTZ_GREEN);
-
+        quartz_render_sprite(pixel, {0,0}, {(float)screen_viewport.width, (float)screen_viewport.height}, 0.0f, bg_color);
+        quartz_render_sprite(dice, mouse_pos, {1.0f, 1.0f}, 0.0f, QUARTZ_GREEN);
         quartz_render_flush();
 
         quartz_swap_buffers();

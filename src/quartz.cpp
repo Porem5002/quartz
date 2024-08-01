@@ -41,7 +41,7 @@ void quartz_start(int width, int height, const char* title)
 
     // Default Config
     quartz_set_vsync(true);
-    glViewport(0, 0, width, height);
+    quartz_set_viewport({0, 0, width, height});
 }
 
 // TODO: Give a more fitting name
@@ -60,6 +60,11 @@ void quartz_update_events()
 void quartz_set_vsync(bool active)
 {
     wglSwapIntervalEXT((int)active);
+}
+
+void quartz_set_viewport(quartz_viewport viewport)
+{
+    glViewport(viewport.x, viewport.y, viewport.width, viewport.height);
 }
 
 void quartz_swap_buffers()
@@ -82,12 +87,17 @@ bool quartz_was_screen_resized()
     return context.window.resized;
 }
 
-quartz_uvec2 quartz_get_screen_size()
+quartz_ivec2 quartz_get_screen_size()
 {
     return context.window.size;
 }
 
-quartz_uvec2 quartz_get_mouse_pos()
+quartz_viewport quartz_get_screen_viewport()
+{
+    return { 0, 0, context.window.size.x, context.window.size.y };
+}
+
+quartz_ivec2 quartz_get_mouse_pos()
 {
     return context.window.mouse_pos;
 }

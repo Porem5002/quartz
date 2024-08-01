@@ -156,8 +156,8 @@ static LRESULT CALLBACK quartz_windows_window_callback(HWND window, UINT msg, WP
             RECT rect;
             GetClientRect(window, &rect);
 
-            auto width = (unsigned)(rect.right - rect.left);
-            auto height = (unsigned)(rect.bottom - rect.top);
+            int width = (int)(rect.right - rect.left);
+            int height = (int)(rect.bottom - rect.top);
 
             curr_active_window->size = { width, height };
             curr_active_window->running = true;
@@ -171,8 +171,8 @@ static LRESULT CALLBACK quartz_windows_window_callback(HWND window, UINT msg, WP
             RECT rect;
             GetClientRect(window, &rect);
 
-            auto new_width = (unsigned)(rect.right - rect.left);
-            auto new_height = (unsigned)(rect.bottom - rect.top);
+            int new_width = (int)(rect.right - rect.left);
+            int new_height = (int)(rect.bottom - rect.top);
 
             curr_active_window->size = { new_width, new_height };
             curr_active_window->resized = true;
@@ -185,8 +185,8 @@ static LRESULT CALLBACK quartz_windows_window_callback(HWND window, UINT msg, WP
             GetCursorPos(&mouse_pos);
             ScreenToClient(curr_active_window->win_window, &mouse_pos);
             
-            auto mouse_x = (unsigned)quartz_clamp((int64_t)mouse_pos.x, 0i64, (int64_t)curr_active_window->size.x);
-            auto mouse_y = (unsigned)quartz_clamp((int64_t)mouse_pos.y, 0i64, (int64_t)curr_active_window->size.y);
+            int mouse_x = quartz_clamp((int)mouse_pos.x, 0, curr_active_window->size.x);
+            int mouse_y = quartz_clamp((int)mouse_pos.y, 0, curr_active_window->size.y);
 
             curr_active_window->mouse_pos.x = mouse_x;
             curr_active_window->mouse_pos.y = curr_active_window->size.y - mouse_y;

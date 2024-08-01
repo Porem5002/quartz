@@ -12,8 +12,8 @@ struct quartz_window
 {
     bool running;
     bool resized;
-    quartz_uvec2 size;
-    quartz_uvec2 mouse_pos;
+    quartz_ivec2 size;
+    quartz_ivec2 mouse_pos;
 
     #if _WIN32
         HWND win_window;

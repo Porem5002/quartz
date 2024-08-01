@@ -49,10 +49,12 @@ quartz_mat4 quartz_camera2D_to_mat4(quartz_camera2D camera)
                             -1.0, 1.0);
 }
 
-quartz_vec2 quartz_screen_to_world2D(quartz_camera2D camera, quartz_uvec2 position)
+quartz_vec2 quartz_viewport_to_world2D(quartz_camera2D camera, quartz_ivec2 position, quartz_viewport viewport)
 {
-    float norm_x = (float)position.x / (float)quartz_get_screen_size().x - 0.5f;
-    float norm_y = (float)position.y / (float)quartz_get_screen_size().y - 0.5f;
+    position = quartz_viewport_clamp_point(viewport, position); 
+
+    float norm_x = (float)(position.x - viewport.x) / viewport.width - 0.5f;
+    float norm_y = (float)(position.y - viewport.y) / viewport.height - 0.5f;
 
     float world_x = camera.x + norm_x * camera.width / camera.zoom;
     float world_y = camera.y + norm_y * camera.height / camera.zoom;

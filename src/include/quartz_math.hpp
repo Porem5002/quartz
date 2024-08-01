@@ -3,6 +3,11 @@
 
 #include <cstdlib>
 
+struct quartz_ivec2
+{
+    int x, y;
+};
+
 struct quartz_uvec2
 {
     unsigned int x, y;
