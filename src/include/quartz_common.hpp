@@ -9,11 +9,30 @@
 
 struct quartz_texture_info
 {
-    unsigned int id;
+    unsigned int glid;
     int width, height, channels;
 };
 
-using quartz_texture = const quartz_texture_info*;
+struct quartz_texture
+{
+    size_t id;
+
+    quartz_texture_info get() const;
+    unsigned int get_glid() const { return get().glid; }
+    int get_width() const { return get().width; }
+    int get_height() const { return get().height; }
+
+    bool operator ==(quartz_texture other) const
+    {
+        return id == other.id;
+    }
+
+    bool operator !=(quartz_texture other) const
+    {
+        return id != other.id;
+    }
+};
+
 using quartz_shader = GLuint;
 
 struct quartz_sprite

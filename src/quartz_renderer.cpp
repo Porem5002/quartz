@@ -55,8 +55,8 @@ quartz_vec2 quartz_viewport_to_world2D(quartz_camera2D camera, quartz_ivec2 posi
 {
     position = quartz_viewport_clamp_point(viewport, position); 
 
-    float norm_x = (float)(position.x - viewport.x) / viewport.width - 0.5f;
-    float norm_y = (float)(position.y - viewport.y) / viewport.height - 0.5f;
+    float norm_x = (float)(position.x - viewport.get_x()) / viewport.get_width() - 0.5f;
+    float norm_y = (float)(position.y - viewport.get_y()) / viewport.get_height() - 0.5f;
 
     float world_x = camera.x + norm_x * camera.width / camera.zoom;
     float world_y = camera.y + norm_y * camera.height / camera.zoom;
@@ -194,9 +194,9 @@ void quartz_render_init()
     #endif
 }
 
-void quartz_render_set_viewport(const quartz_viewport* viewport)
+void quartz_render_set_viewport(quartz_viewport viewport)
 {
-    renderer.viewport = *viewport;
+    renderer.viewport = viewport;
 }
 
 void quartz_render_set_camera(const quartz_camera2D* camera)
@@ -246,7 +246,7 @@ void quartz_render_texture(quartz_texture texture, quartz_vec2 pos, quartz_vec2 
         quartz_render_flush();
 
     quartz_instance_data instance = {
-        pos, {0,0}, {1,1}, {(float)texture->width * scale.x, (float)texture->height * scale.y}, tint, rotation, (float)slot
+        pos, {0,0}, {1,1}, { texture.get_width() * scale.x, texture.get_height() * scale.y}, tint, rotation, (float)slot
     };
 
     renderer.instances[renderer.batch_size] = instance;
@@ -261,13 +261,13 @@ void quartz_render_sprite(quartz_sprite sprite, quartz_vec2 pos, quartz_vec2 sca
         quartz_render_flush();
 
     quartz_vec2 uv_offset = {
-        (float)sprite.offset.x / (float)sprite.atlas->width,
-        (float)sprite.offset.y / (float)sprite.atlas->height
+        (float)sprite.offset.x / (float)sprite.atlas.get_width(),
+        (float)sprite.offset.y / (float)sprite.atlas.get_height()
     };
 
     quartz_vec2 uv_size = {
-        (float)sprite.size.x / (float)sprite.atlas->width,
-        (float)sprite.size.y / (float)sprite.atlas->height
+        (float)sprite.size.x / (float)sprite.atlas.get_width(),
+        (float)sprite.size.y / (float)sprite.atlas.get_height()
     };
 
     quartz_instance_data instance = {
@@ -286,7 +286,8 @@ void quartz_render_flush()
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glDisable(GL_MULTISAMPLE);
 
-    glViewport(renderer.viewport.x, renderer.viewport.y, renderer.viewport.width, renderer.viewport.height);
+    glViewport(renderer.viewport.get_x(), renderer.viewport.get_y(),
+               renderer.viewport.get_width(), renderer.viewport.get_height());
 
     quartz_use_shader(renderer.shader);
 

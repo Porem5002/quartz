@@ -1,4 +1,5 @@
 
+#include <vector>
 #include <chrono>
 #include <malloc.h>
 
@@ -16,13 +17,30 @@ struct quartz_context
 
     float delta_time;
 
-    size_t textures_size;
-    quartz_texture_info textures [TEXTURE_CAP];
+    std::vector<quartz_texture_info> textures;
+    std::vector<quartz_viewport_info> viewports;
+    
+    quartz_viewport screen_viewport;
 
     quartz_window window;
 };
 
 quartz_context context;
+
+quartz_texture_info quartz_texture::get() const
+{
+    return context.textures[this->id];
+}
+
+void quartz_viewport::set(quartz_viewport_info val)
+{
+    context.viewports[this->id] = val;
+}
+
+quartz_viewport_info quartz_viewport::get() const
+{
+    return context.viewports[this->id];
+}
 
 static void APIENTRY quartz_gl_debug_callback(GLenum source, GLenum type, 
                                 GLuint id, GLenum severity,
@@ -41,6 +59,7 @@ void quartz_start(int width, int height, const char* title)
 
     // Default Config
     quartz_set_vsync(true);
+    context.screen_viewport = quartz_make_viewport({ 0, 0, context.window.size.x, context.window.size.y });
 }
 
 bool quartz_update()
@@ -59,6 +78,12 @@ bool quartz_update()
 
         quartz_update_key_states();
         quartz_window_update(&context.window);
+
+        if(quartz_was_screen_resized())
+        {
+            auto screen_size = quartz_get_screen_size();
+            context.screen_viewport.set({ 0, 0, screen_size.x, screen_size.y });
+        }
     }
 
     return running;
@@ -91,7 +116,7 @@ quartz_ivec2 quartz_get_screen_size()
 
 quartz_viewport quartz_get_screen_viewport()
 {
-    return { 0, 0, context.window.size.x, context.window.size.y };
+    return context.screen_viewport;
 }
 
 quartz_ivec2 quartz_get_mouse_pos()
@@ -122,9 +147,9 @@ quartz_texture quartz_load_texture(const char* path)
 
     QUARTZ_ASSERT(data != nullptr, "Could not load texture from the path");
 
-    GLuint texture_id;
-    glGenTextures(1, &texture_id);
-    glBindTexture(GL_TEXTURE_2D, texture_id);
+    GLuint id;
+    glGenTextures(1, &id);
+    glBindTexture(GL_TEXTURE_2D, id);
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
@@ -137,21 +162,28 @@ quartz_texture quartz_load_texture(const char* path)
 
     stbi_image_free(data);
 
-    QUARTZ_ASSERT(context.textures_size < context.TEXTURE_CAP, "Exceeded max textures allowed!");
-    quartz_texture_info* texture = &context.textures[context.textures_size++];
-    
-    texture->id = texture_id;
-    texture->width = w;
-    texture->height = h;
-    texture->channels = channels;
-    
+    quartz_texture_info texture_info;
+    texture_info.glid = id;
+    texture_info.width = w;
+    texture_info.height = h;
+    texture_info.channels = channels;
+
+    quartz_texture texture = { context.textures.size() };
+    context.textures.push_back(texture_info);
     return texture;
 }
 
 void quartz_bind_texture(quartz_texture texture, unsigned int slot)
 {
     glActiveTexture(GL_TEXTURE0 + slot);
-    glBindTexture(GL_TEXTURE_2D, texture->id);
+    glBindTexture(GL_TEXTURE_2D, texture.get_glid());
+}
+
+quartz_viewport quartz_make_viewport(quartz_viewport_info init_val = { 0, 0, 0, 0 })
+{
+    quartz_viewport viewport = { context.viewports.size() };
+    context.viewports.push_back(init_val);
+    return viewport;
 }
 
 GLuint quartz_shader_from_source(GLenum shader_type, const char* shader_src)

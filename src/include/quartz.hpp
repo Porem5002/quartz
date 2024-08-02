@@ -26,6 +26,8 @@ void quartz_use_shader(quartz_shader shader);
 quartz_texture quartz_load_texture(const char* path);
 void quartz_bind_texture(quartz_texture texture, unsigned int slot);
 
+quartz_viewport quartz_make_viewport(quartz_viewport_info init);
+
 GLuint quartz_shader_from_source(GLenum shader_type, const char* shader_src);
 GLuint quartz_program_from_shaders(GLuint vs_id, GLuint fs_id);
 void quartz_compile_shader(GLuint shader_id);
