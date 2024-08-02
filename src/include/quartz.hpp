@@ -9,10 +9,8 @@
 #include "quartz_viewport.hpp"
 
 void quartz_start(int width, int height, const char* title);
-void quartz_update_events();
+bool quartz_update();
 void quartz_set_vsync(bool active);
-void quartz_set_viewport(quartz_viewport viewport);
-void quartz_swap_buffers();
 
 bool quartz_is_running();
 float quartz_get_delta_time();
@@ -31,6 +29,8 @@ void quartz_bind_texture(quartz_texture texture, unsigned int slot);
 GLuint quartz_shader_from_source(GLenum shader_type, const char* shader_src);
 GLuint quartz_program_from_shaders(GLuint vs_id, GLuint fs_id);
 void quartz_compile_shader(GLuint shader_id);
+
+void quartz_clear(quartz_color color);
 
 #endif
 

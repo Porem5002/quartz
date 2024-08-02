@@ -41,35 +41,32 @@ void quartz_start(int width, int height, const char* title)
 
     // Default Config
     quartz_set_vsync(true);
-    quartz_set_viewport({0, 0, width, height});
 }
 
-// TODO: Give a more fitting name
-void quartz_update_events()
+bool quartz_update()
 {
-    static auto last_time = std::chrono::system_clock::now();
-    auto curr_time = std::chrono::system_clock::now();
-    
-    context.delta_time = std::chrono::duration<float>(curr_time - last_time).count();
-    last_time = curr_time;
+    bool running = quartz_is_running();
 
-    quartz_update_key_states();
-    quartz_window_update(&context.window);
+    if(running)
+    {
+        quartz_window_swap_buffers(&context.window);
+
+        static auto last_time = std::chrono::system_clock::now();
+        auto curr_time = std::chrono::system_clock::now();
+        
+        context.delta_time = std::chrono::duration<float>(curr_time - last_time).count();
+        last_time = curr_time;
+
+        quartz_update_key_states();
+        quartz_window_update(&context.window);
+    }
+
+    return running;
 }
 
 void quartz_set_vsync(bool active)
 {
     wglSwapIntervalEXT((int)active);
-}
-
-void quartz_set_viewport(quartz_viewport viewport)
-{
-    glViewport(viewport.x, viewport.y, viewport.width, viewport.height);
-}
-
-void quartz_swap_buffers()
-{
-    quartz_window_swap_buffers(&context.window);
 }
 
 bool quartz_is_running()
@@ -203,6 +200,12 @@ void quartz_compile_shader(GLuint shader_id)
         glGetShaderInfoLog(shader_id, 2048, 0, shaderLog);
         QUARTZ_ASSERT(false, shaderLog);
     }
+}
+
+void quartz_clear(quartz_color color)
+{
+    glClearColor(color.r, color.g, color.b, color.a);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 static void APIENTRY quartz_gl_debug_callback(GLenum source, GLenum type, 

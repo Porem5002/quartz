@@ -34,19 +34,21 @@ struct quartz_renderer
 
     size_t texture_slot_index;
     quartz_texture texture_slots [TEXTURE_SLOT_CAP];
+
+    quartz_viewport viewport;
 };
 
 static quartz_renderer renderer;
 
 static unsigned int quartz_render_push_new_texture(quartz_texture texture);
 
-quartz_mat4 quartz_camera2D_to_mat4(quartz_camera2D camera)
+void quartz_camera2D_recalc(quartz_camera2D* camera)
 {
-    return quartz_orth_proj(camera.x - camera.width / (2 * camera.zoom),
-                            camera.x + camera.width / (2 * camera.zoom),
-                            camera.y - camera.height / (2 * camera.zoom),
-                            camera.y + camera.height / (2 * camera.zoom),
-                            -1.0, 1.0);
+    camera->projection = quartz_orth_proj(camera->x - camera->width / (2 * camera->zoom),
+                                          camera->x + camera->width / (2 * camera->zoom),
+                                          camera->y - camera->height / (2 * camera->zoom),
+                                          camera->y + camera->height / (2 * camera->zoom),
+                                          -1.0, 1.0);
 }
 
 quartz_vec2 quartz_viewport_to_world2D(quartz_camera2D camera, quartz_ivec2 position, quartz_viewport viewport)
@@ -192,16 +194,15 @@ void quartz_render_init()
     #endif
 }
 
-void quartz_render_set_mvp(quartz_mat4& mvp)
+void quartz_render_set_viewport(const quartz_viewport* viewport)
 {
-    quartz_use_shader(renderer.shader);
-    glUniformMatrix4fv(renderer.u_mvp, 1, GL_FALSE, &mvp.values[0][0]);
+    renderer.viewport = *viewport;
 }
 
-void quartz_render_clear(float r, float g, float b, float a)
+void quartz_render_set_camera(const quartz_camera2D* camera)
 {
-    glClearColor(r, g, b, a);
-    glClear(GL_COLOR_BUFFER_BIT);
+    quartz_use_shader(renderer.shader);
+    glUniformMatrix4fv(renderer.u_mvp, 1, GL_FALSE, &camera->projection.values[0][0]);
 }
 
 static unsigned int quartz_render_push_new_texture(quartz_texture texture)
@@ -284,6 +285,8 @@ void quartz_render_flush()
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glDisable(GL_MULTISAMPLE);
+
+    glViewport(renderer.viewport.x, renderer.viewport.y, renderer.viewport.width, renderer.viewport.height);
 
     quartz_use_shader(renderer.shader);
 
