@@ -1,5 +1,5 @@
-#include "include/quartz.hpp"
-#include "include/glload.hpp"
+#include "../include/quartz.hpp"
+#include "../include/glload.hpp"
 
 static PFNGLCREATEPROGRAMPROC glCreateProgram_ptr;
 static PFNGLDELETETEXTURESPROC glDeleteTextures_ptr;

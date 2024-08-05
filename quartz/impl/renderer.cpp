@@ -1,8 +1,9 @@
 #include <cstring>
 
-#include "include/quartz_renderer.hpp"
-#include "include/quartz_common.hpp"
-#include "include/quartz.hpp"
+#include "../include/glinclude.hpp"
+#include "../include/renderer.hpp"
+#include "../include/common.hpp"
+#include "../include/quartz.hpp"
 
 struct quartz_instance_data
 {

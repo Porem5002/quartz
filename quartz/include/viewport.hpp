@@ -3,6 +3,8 @@
 
 #include <cstdlib>
 
+#include "math.hpp"
+
 struct quartz_viewport_info
 {
     int x, y;

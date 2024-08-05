@@ -4,8 +4,7 @@
 #include <cstdio>
 #include <cstdint>
 
-#include "glinclude.hpp"
-#include "quartz_math.hpp"
+#include "math.hpp"
 
 struct quartz_texture_info
 {
@@ -33,7 +32,7 @@ struct quartz_texture
     }
 };
 
-using quartz_shader = GLuint;
+using quartz_shader = unsigned int;
 
 struct quartz_sprite
 {

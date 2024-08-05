@@ -6,7 +6,7 @@
 
 #include <cstdint>
 
-#include "quartz_math.hpp"
+#include "math.hpp"
 
 struct quartz_window
 {

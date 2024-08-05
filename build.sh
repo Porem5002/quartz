@@ -1,7 +1,9 @@
-defines="-D_CRT_SECURE_NO_WARNINGS"
-libs="-luser32 -lopengl32 -lgdi32"
-includes="-Ithird_party -Isrc"
-warnings="-Wall -Wextra -Wpedantic"
-cppflags="-std=c++17"
+compiler="g++"
+cppflags="-O2 -static -std=c++17 -Wall -Wextra -Wpedantic -D_CRT_SECURE_NO_WARNINGS"
 
-clang++ $defines $libs $includes $warnings $cppflags example/main.cpp -g -o quartz.exe
+includedirs="-Ithird_party"
+$compiler $cppflags $includedirs quartz/quartz_impl.cpp -c -o quartz.obj
+
+libs="-luser32 -lopengl32 -lgdi32"
+includedirs="-Iquartz"
+$compiler $cppflags $includedirs examples/pong/*.cpp quartz.obj $libs -o pong.exe

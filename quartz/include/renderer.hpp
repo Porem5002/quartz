@@ -3,8 +3,7 @@
 
 #include <cstdlib>
 
-#include "glinclude.hpp"
-#include "quartz_common.hpp"
+#include "common.hpp"
 
 struct quartz_camera2D
 {

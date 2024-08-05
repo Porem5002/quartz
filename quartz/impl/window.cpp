@@ -1,7 +1,7 @@
-#include "include/glload.hpp"
-#include "include/quartz_common.hpp"
-#include "include/quartz_window.hpp"
-#include "include/quartz_input.hpp"
+#include "../include/glload.hpp"
+#include "../include/common.hpp"
+#include "../include/window.hpp"
+#include "../include/input.hpp"
 
 #ifdef _WIN32
 

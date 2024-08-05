@@ -5,11 +5,11 @@
 
 #include <stb_image.h>
 
-#include "include/quartz.hpp"
-#include "include/glload.hpp"
-#include "include/glinclude.hpp"
-#include "include/quartz_window.hpp"
-#include "include/quartz_input.hpp"
+#include "../include/quartz.hpp"
+#include "../include/glload.hpp"
+#include "../include/glinclude.hpp"
+#include "../include/window.hpp"
+#include "../include/input.hpp"
 
 struct quartz_context
 {
@@ -186,7 +186,7 @@ quartz_viewport quartz_make_viewport(quartz_viewport_info init_val = { 0, 0, 0, 
     return viewport;
 }
 
-GLuint quartz_shader_from_source(GLenum shader_type, const char* shader_src)
+unsigned int quartz_shader_from_source(unsigned int shader_type, const char* shader_src)
 {
     GLuint id = glCreateShader(shader_type);
     glShaderSource(id, 1, &shader_src, nullptr);
@@ -194,7 +194,7 @@ GLuint quartz_shader_from_source(GLenum shader_type, const char* shader_src)
     return id;
 }
 
-GLuint quartz_program_from_shaders(GLuint vs_id, GLuint fs_id)
+unsigned int quartz_program_from_shaders(unsigned int vs_id, unsigned int fs_id)
 {
     GLuint id = glCreateProgram();
     glAttachShader(id, vs_id);
@@ -219,7 +219,7 @@ GLuint quartz_program_from_shaders(GLuint vs_id, GLuint fs_id)
     return id;
 }
 
-void quartz_compile_shader(GLuint shader_id)
+void quartz_compile_shader(unsigned int shader_id)
 {
     glCompileShader(shader_id);
 

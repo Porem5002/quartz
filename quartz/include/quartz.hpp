@@ -4,9 +4,8 @@
 #include <cstdlib>
 #include <cstdint>
 
-#include "glinclude.hpp"
-#include "quartz_common.hpp"
-#include "quartz_viewport.hpp"
+#include "common.hpp"
+#include "viewport.hpp"
 
 void quartz_start(int width, int height, const char* title);
 bool quartz_update();
@@ -28,11 +27,10 @@ void quartz_bind_texture(quartz_texture texture, unsigned int slot);
 
 quartz_viewport quartz_make_viewport(quartz_viewport_info init);
 
-GLuint quartz_shader_from_source(GLenum shader_type, const char* shader_src);
-GLuint quartz_program_from_shaders(GLuint vs_id, GLuint fs_id);
-void quartz_compile_shader(GLuint shader_id);
+unsigned int quartz_shader_from_source(unsigned int shader_type, const char* shader_src);
+unsigned int quartz_program_from_shaders(unsigned int vs_id, unsigned int fs_id);
+void quartz_compile_shader(unsigned int shader_id);
 
 void quartz_clear(quartz_color color);
 
 #endif
-

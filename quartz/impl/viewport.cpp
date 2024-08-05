@@ -1,7 +1,7 @@
 #include <cmath>
 
-#include "include/quartz_math.hpp"
-#include "include/quartz_viewport.hpp"
+#include "../include/math.hpp"
+#include "../include/viewport.hpp"
 
 quartz_viewport_info quartz_viewport_calc_boxed(quartz_viewport container, int content_width, int content_height)
 { 

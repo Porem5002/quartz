@@ -1,4 +1,4 @@
-#include "include/quartz_input.hpp"
+#include "../include/input.hpp"
 
 struct quartz_key_state
 {

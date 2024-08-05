@@ -1,4 +1,4 @@
-#include "include/quartz_math.hpp"
+#include "../include/math.hpp"
 
 quartz_mat4 quartz_orth_proj(float left, float right, float bottom, float top, float near_, float far_)
 {
