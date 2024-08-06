@@ -1,6 +1,7 @@
 .vs
 .vscode
-assets
+
+build
 
 *.exe
 *.obj
