@@ -25,9 +25,9 @@ struct player
 
     void update(float dt);
 
-    void draw(quartz_sprite quad)
+    void draw()
     {
-        quartz_render_sprite(quad, position, SIZE, 0.0f, color);
+        quartz_render_quad(color, position, SIZE);
     }
 };
 

@@ -76,27 +76,27 @@ struct game_data
             mode = game_mode::FINISHED;
     }
 
-    void draw(quartz_sprite quad)
+    void draw()
     {
-        quartz_render_sprite(quad, {0, 0}, {(float)WORLD_WIDTH, (float)WORLD_HEIGHT}, 0.0f, BG_COLOR);
+        quartz_render_quad(BG_COLOR, {0, 0}, {(float)WORLD_WIDTH, (float)WORLD_HEIGHT});
 
-        b.draw(quad);
-        p1.draw(quad);
-        p2.draw(quad);
+        b.draw();
+        p1.draw();
+        p2.draw();
 
-        draw_points_for_player(quad, p1, -1);
-        draw_points_for_player(quad, p2, 1);
+        draw_points_for_player(p1, -1);
+        draw_points_for_player(p2, 1);
         
         if(mode != game_mode::PLAYING)
-            quartz_render_sprite(quad, {0, 0}, {(float)WORLD_WIDTH, (float)WORLD_HEIGHT}, 0.0f, PAUSE_PANEL_COLOR);
+            quartz_render_quad(PAUSE_PANEL_COLOR, {0, 0}, {(float)WORLD_WIDTH, (float)WORLD_HEIGHT});
     }
 
-    void draw_points_for_player(quartz_sprite quad, const player& p, float dir_x)
+    void draw_points_for_player(const player& p, float dir_x)
     {
         for(int i = 0; i < game_data::POINTS_TO_WIN; i++)
         {
             quartz_color color = p.points >= (i + 1) ? p.color : QUARTZ_WHITE;
-            quartz_render_sprite(quad, { dir_x * (30.0f + 10.0f * (i + 1)), 180 }, { 5, 15 }, 0.0f, color);
+            quartz_render_quad(color, { dir_x * (30.0f + 10.0f * (i + 1)), 180 }, { 5, 15 });
         }
     }
 };

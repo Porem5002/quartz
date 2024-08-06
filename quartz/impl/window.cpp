@@ -84,7 +84,6 @@ quartz_window quartz_window_create(int width, int height, const char* title)
         WGL_DRAW_TO_WINDOW_ARB, GL_TRUE,
         WGL_SUPPORT_OPENGL_ARB, GL_TRUE,
         WGL_DOUBLE_BUFFER_ARB, GL_TRUE,
-        WGL_SWAP_METHOD_ARB, WGL_SWAP_COPY_ARB,
         WGL_PIXEL_TYPE_ARB, WGL_TYPE_RGBA_ARB,
         WGL_ACCELERATION_ARB, WGL_FULL_ACCELERATION_ARB,
         WGL_COLOR_BITS_ARB, 32,

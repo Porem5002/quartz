@@ -9,9 +9,6 @@ int main()
     quartz_start(1280, 720, "Quartz Pong");
 
     quartz_render_init();
-    
-    quartz_texture quad_texture = quartz_load_texture("assets/TEXTURE_ATLAS.png");
-    quartz_sprite quad = { quad_texture, {0, 0}, {1, 1} };
 
     game_data game = {};
 
@@ -36,7 +33,7 @@ int main()
         quartz_render_set_viewport(game_vp);
         quartz_render_set_camera(&cam);
 
-        game.draw(quad);
+        game.draw();
         
         quartz_render_flush();
     }

@@ -36,6 +36,7 @@ struct quartz_renderer
     size_t texture_slot_index;
     quartz_texture texture_slots [TEXTURE_SLOT_CAP];
 
+    quartz_sprite quad_sprite;
     quartz_viewport viewport;
 };
 
@@ -68,7 +69,7 @@ quartz_vec2 quartz_viewport_to_world2D(quartz_camera2D camera, quartz_ivec2 posi
 void quartz_render_init()
 {
     #if 1 // Section: Shader
-    static const char* vertex_shader = "#version 330 core\n"
+    static const char* vertex_shader = "#version 400 core\n"
                                     "layout (location = 0) in vec2 v_vertex;\n"
                                     "layout (location = 1) in vec2 v_uvMult;\n"
                                     "layout (location = 2) in vec2 v_position;\n"
@@ -98,7 +99,7 @@ void quartz_render_init()
                                         "gl_Position = u_mvp * final_pos;\n"
                                     "}\n";
 
-    static const char* frag_shader = "#version 330 core\n"
+    static const char* frag_shader = "#version 400 core\n"
                                     "in vec2 f_texturePos;\n"
                                     "in vec4 f_color;\n"
                                     "in float f_textureIndex;\n"
@@ -193,6 +194,13 @@ void quartz_render_init()
 
     glBindVertexArray(0);
     #endif
+
+    // White pixel texture
+    unsigned char quad_pixel [] = { 255, 255, 255, 255 };
+    quartz_texture quad_texture = quartz_make_texture(1, 1, quad_pixel);
+
+    renderer.quad_sprite = { quad_texture, {0,0}, {1, 1} };
+    renderer.viewport = quartz_get_screen_viewport();
 }
 
 void quartz_render_set_viewport(quartz_viewport viewport)
@@ -277,6 +285,11 @@ void quartz_render_sprite(quartz_sprite sprite, quartz_vec2 pos, quartz_vec2 sca
 
     renderer.instances[renderer.batch_size] = instance;
     renderer.batch_size++;
+}
+
+void quartz_render_quad(quartz_color color, quartz_vec2 pos, quartz_vec2 scale, float rotation)
+{
+    quartz_render_sprite(renderer.quad_sprite, pos, scale, rotation, color);
 }
 
 void quartz_render_flush()

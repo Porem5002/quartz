@@ -4,6 +4,7 @@
 #include <cstdlib>
 
 #include "common.hpp"
+#include "viewport.hpp"
 
 struct quartz_camera2D
 {
@@ -24,6 +25,7 @@ void quartz_render_set_viewport(quartz_viewport viewport);
 void quartz_render_set_camera(const quartz_camera2D* camera);
 void quartz_render_texture(quartz_texture texture, quartz_vec2 pos, quartz_vec2 scale = {1.0f, 1.0f}, float rotation = 0.0f, quartz_color tint = QUARTZ_WHITE);
 void quartz_render_sprite(quartz_sprite sprite, quartz_vec2 pos, quartz_vec2 scale = {1.0f, 1.0f}, float rotation = 0.0f, quartz_color tint = QUARTZ_WHITE);
+void quartz_render_quad(quartz_color color, quartz_vec2 pos, quartz_vec2 scale, float rotation = 0.0f);
 void quartz_render_flush();
 
 #endif

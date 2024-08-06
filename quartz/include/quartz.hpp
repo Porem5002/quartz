@@ -23,6 +23,7 @@ quartz_shader quartz_make_shader(const char* vs_code, const char* fs_code);
 void quartz_use_shader(quartz_shader shader);
 
 quartz_texture quartz_load_texture(const char* path);
+quartz_texture quartz_make_texture(int width, int height, unsigned char* data);
 void quartz_bind_texture(quartz_texture texture, unsigned int slot);
 
 quartz_viewport quartz_make_viewport(quartz_viewport_info init);

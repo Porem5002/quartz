@@ -144,9 +144,16 @@ quartz_texture quartz_load_texture(const char* path)
 
     int w, h, channels;
     auto data = stbi_load(path, &w, &h, &channels, 4);
-
     QUARTZ_ASSERT(data != nullptr, "Could not load texture from the path");
+    
+    quartz_texture texture = quartz_make_texture(w, h, data);
+    stbi_image_free(data);
 
+    return texture;
+}
+
+quartz_texture quartz_make_texture(int width, int height, unsigned char* data)
+{
     GLuint id;
     glGenTextures(1, &id);
     glBindTexture(GL_TEXTURE_2D, id);
@@ -157,16 +164,14 @@ quartz_texture quartz_load_texture(const char* path)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
     glBindTexture(GL_TEXTURE_2D, 0);
-
-    stbi_image_free(data);
 
     quartz_texture_info texture_info;
     texture_info.glid = id;
-    texture_info.width = w;
-    texture_info.height = h;
-    texture_info.channels = channels;
+    texture_info.width = width;
+    texture_info.height = height;
+    texture_info.channels = 4;
 
     quartz_texture texture = { context.textures.size() };
     context.textures.push_back(texture_info);
