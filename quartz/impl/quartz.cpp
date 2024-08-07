@@ -13,9 +13,13 @@
 
 struct quartz_context
 {
-    static constexpr size_t TEXTURE_CAP = 10;
+    static constexpr float DEFAULT_FIXED_DELTA_TIME = 1.0f / 60.0f;
 
     float delta_time;
+
+    bool is_fixed_update;
+    float fixed_delta_time;
+    float fixed_accumulator;
 
     std::vector<quartz_texture_info> textures;
     std::vector<quartz_viewport_info> viewports;
@@ -59,6 +63,9 @@ void quartz_start(int width, int height, const char* title)
 
     // Default Config
     quartz_set_vsync(true);
+    context.is_fixed_update = false;
+    context.fixed_delta_time = context.DEFAULT_FIXED_DELTA_TIME;
+    context.fixed_accumulator = 0.0f;
     context.screen_viewport = quartz_make_viewport({ 0, 0, context.window.size.x, context.window.size.y });
 }
 
@@ -68,13 +75,18 @@ bool quartz_update()
 
     if(running)
     {
+        // End Last Frame
         quartz_window_swap_buffers(&context.window);
 
+        // Start Current Frame
         static auto last_time = std::chrono::system_clock::now();
         auto curr_time = std::chrono::system_clock::now();
-        
-        context.delta_time = std::chrono::duration<float>(curr_time - last_time).count();
+
+        float delta_time = std::chrono::duration<float>(curr_time - last_time).count();
         last_time = curr_time;
+
+        context.delta_time = delta_time;
+        context.fixed_accumulator += delta_time;
 
         quartz_update_key_states();
         quartz_window_update(&context.window);
@@ -89,9 +101,24 @@ bool quartz_update()
     return running;
 }
 
+bool quartz_fixed_update()
+{
+    context.is_fixed_update = context.fixed_accumulator >= context.fixed_delta_time;
+
+    if(context.is_fixed_update)
+        context.fixed_accumulator -= context.fixed_delta_time;
+
+    return context.is_fixed_update;
+}
+
 void quartz_set_vsync(bool active)
 {
     wglSwapIntervalEXT((int)active);
+}
+
+void quartz_set_fixed_delta_time(float fixed_delta_time)
+{
+    context.fixed_delta_time = fixed_delta_time;
 }
 
 bool quartz_is_running()
@@ -101,7 +128,7 @@ bool quartz_is_running()
 
 float quartz_get_delta_time()
 {
-    return context.delta_time;
+    return context.is_fixed_update ? context.fixed_delta_time : context.delta_time;
 }
 
 bool quartz_was_screen_resized()

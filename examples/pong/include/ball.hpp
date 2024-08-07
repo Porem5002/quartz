@@ -23,7 +23,7 @@ struct ball
         return { position.x, position.y, SIZE.x / 2.0f, SIZE.y / 2.0f };
     }
 
-    void update(float dt, game_data& game);
+    void fixed_update(game_data& game);
 
     void draw()
     {

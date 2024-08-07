@@ -9,7 +9,10 @@
 
 void quartz_start(int width, int height, const char* title);
 bool quartz_update();
+bool quartz_fixed_update();
+
 void quartz_set_vsync(bool active);
+void quartz_set_fixed_delta_time(float fixed_delta_time);
 
 bool quartz_is_running();
 float quartz_get_delta_time();

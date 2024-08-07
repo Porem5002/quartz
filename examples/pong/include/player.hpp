@@ -17,13 +17,16 @@ struct player
     quartz_keycode down_key;
 
     int points = 0;
+    float move_y = 0.0f;
 
     aabb get_aabb() const
     {
         return { position.x, position.y, SIZE.x / 2.0f, SIZE.y / 2.0f };
     }
 
-    void update(float dt);
+    void update();
+
+    void fixed_update();
 
     void draw()
     {

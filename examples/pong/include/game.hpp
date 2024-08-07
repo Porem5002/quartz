@@ -31,7 +31,7 @@ struct game_data
     player p2 = { {250, 0}, P2_COLOR, QUARTZ_KEY_U, QUARTZ_KEY_J };
     ball b = {};
 
-    void update(float dt)
+    void update()
     {
         switch(mode)
         {
@@ -40,14 +40,23 @@ struct game_data
                     mode = game_mode::PLAYING;
                 break;
             case game_mode::PLAYING:
-                p1.update(dt);
-                p2.update(dt);
-                b.update(dt, *this);
+                p1.update();
+                p2.update();
                 break;
             case game_mode::FINISHED:
                 if(quartz_is_key_down(QUARTZ_KEY_SPACE))
                     reset();
                 break;
+        }
+    }
+
+    void fixed_update()
+    {
+        if(mode == game_mode::PLAYING)
+        {
+            p1.fixed_update();
+            p2.fixed_update();
+            b.fixed_update(*this);
         }
     }
 
