@@ -5,65 +5,64 @@
 
 void ball::fixed_update(game_data& game)
 {
-    position.x += velocity.x * quartz_get_delta_time();
-    position.y += velocity.y * quartz_get_delta_time();
+    quartz_vec2 v = velocity;
+    v.x *= quartz_get_delta_time();
+    v.y *= quartz_get_delta_time();
 
-    aabb collider = get_aabb();
+    quartz_aabb2 ball_box = get_aabb();
 
-    bool collided_y = collider.y + collider.hheight > game_data::WORLD_HEIGHT/2.0f ||
-                      collider.y - collider.hheight < -game_data::WORLD_HEIGHT/2.0f;
-    
-    bool collided_p1 = aabb_is_colliding(collider, game.p1.get_aabb());
-    bool collided_p2 = aabb_is_colliding(collider, game.p2.get_aabb());
+    struct obstacle_info { quartz_vec2 v; quartz_aabb2 box; };
 
-    //TODO: Improve Collisions detection using Sweep AABB
-    if(collided_p1 || collided_p2 || collided_y)
+    // NOTE: Taking velocity of the players into account leading to more accurate collisions
+    obstacle_info obstacles [4] = {
+        { game.p1.get_velocity(), game.p1.get_aabb() },
+        { game.p2.get_velocity(), game.p2.get_aabb() },
+        { {0,0}, { 0, game.WORLD_HEIGHT / 2.0f + 5.0f, game.WORLD_WIDTH/2.0f, 5.0f } },
+        { {0,0}, { 0, -game.WORLD_HEIGHT / 2.0f - 5.0f, game.WORLD_WIDTH/2.0f, 5.0f } },
+    };
+ 
+    size_t col_index = 0;
+    quartz_swept_info col = {false, 1.0, {0.0,0.0}};
+
+    // NOTE: Find the collision that limits the movement the most (min t)
+    for(size_t i = 0; i < 4; i++)
     {
-        if(!colliding)
+        quartz_swept_info curr_col = quartz_aabb2_swept_aabb2(ball_box, v, obstacles[i].box, obstacles[i].v);
+
+        if(curr_col.collided && curr_col.t < col.t)
         {
-            if(collided_p1)
-            {
-                quartz_vec2 diff;
-                diff.x = position.x - game.p1.position.x;
-                diff.y = position.y - game.p1.position.y; 
-
-                float dist = sqrtf(diff.x * diff.x + diff.y * diff.y);
-
-                quartz_vec2 dir = diff;
-                dir.x /= dist;
-                dir.y /= dist;
-
-                velocity.x = dir.x * PLAYING_SPEED;
-                velocity.y = dir.y * PLAYING_SPEED;
-            }
-
-            if(collided_p2)
-            {
-                quartz_vec2 diff;
-                diff.x = position.x - game.p2.position.x;
-                diff.y = position.y - game.p2.position.y; 
-
-                float dist = sqrtf(diff.x * diff.x + diff.y * diff.y);
-
-                quartz_vec2 dir = diff;
-                dir.x /= dist;
-                dir.y /= dist;
-
-                velocity.x = dir.x * PLAYING_SPEED;
-                velocity.y = dir.y * PLAYING_SPEED;
-            }
-            
-            if(collided_y) velocity.y *= -1;
+            col = curr_col;
+            col_index = i;
         }
-
-        colliding = true;
     }
-    else
+    
+    position.x += v.x * col.t;
+    position.y += v.y * col.t;
+
+    if(col.collided)
     {
-        colliding = false;
+        if(col_index == 0 || col_index == 1)
+        {
+            quartz_vec2 diff;
+            diff.x = position.x - obstacles[col_index].box.x;
+            diff.y = position.y - obstacles[col_index].box.y;
+
+            float dist = sqrtf(diff.x * diff.x + diff.y * diff.y);
+
+            quartz_vec2 dir = diff;
+            dir.x /= dist;
+            dir.y /= dist;
+
+            velocity.x = dir.x * PLAYING_SPEED;
+            velocity.y = dir.y * PLAYING_SPEED;
+        }
+        else
+        {
+            velocity.y *= -1;
+        }
     }
 
-    if(collider.x - collider.hwidth > game_data::WORLD_WIDTH/2.0f)
+    if(ball_box.x - ball_box.hwidth > game_data::WORLD_WIDTH/2.0f)
     {
         game.add_point_to_p1();
     
@@ -74,7 +73,7 @@ void ball::fixed_update(game_data& game)
         }
     }
 
-    if(collider.x + collider.hwidth < -game_data::WORLD_WIDTH/2.0f)
+    if(ball_box.x + ball_box.hwidth < -game_data::WORLD_WIDTH/2.0f)
     {
         game.add_point_to_p2();
 

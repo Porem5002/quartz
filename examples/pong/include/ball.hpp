@@ -2,7 +2,6 @@
 #define PONG_BALL_HEADER
 
 #include "player.hpp"
-#include "aabb.hpp"
 
 struct game_data;
 
@@ -16,9 +15,7 @@ struct ball
     quartz_vec2 velocity = { IDLE_SPEED, 0 };
     quartz_color color = QUARTZ_WHITE;
 
-    bool colliding = false;
-
-    aabb get_aabb() const
+    quartz_aabb2 get_aabb() const
     {
         return { position.x, position.y, SIZE.x / 2.0f, SIZE.y / 2.0f };
     }

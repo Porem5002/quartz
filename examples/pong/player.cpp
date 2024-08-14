@@ -16,7 +16,7 @@ void player::update()
 
 void player::fixed_update()
 {
-    position.y += move_y * SPEED * quartz_get_delta_time();
+    position.y += get_velocity().y;
     position.y = quartz_clamp(position.y, -(game_data::WORLD_HEIGHT - SIZE.y) / 2.0f,
                                            (game_data::WORLD_HEIGHT - SIZE.y) / 2.0f);
 }

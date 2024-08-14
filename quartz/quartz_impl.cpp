@@ -5,6 +5,7 @@
 #include "impl/window.cpp"
 #include "impl/input.cpp"
 #include "impl/viewport.cpp"
+#include "impl/collisions.cpp"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>

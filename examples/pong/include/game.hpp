@@ -54,9 +54,9 @@ struct game_data
     {
         if(mode == game_mode::PLAYING)
         {
+            b.fixed_update(*this);
             p1.fixed_update();
             p2.fixed_update();
-            b.fixed_update(*this);
         }
     }
 
