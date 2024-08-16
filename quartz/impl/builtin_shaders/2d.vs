@@ -28,6 +28,6 @@ void main()
                         0.0, 0.0, 1.0, 0.0,
                         0.0, 0.0, 0.0, 1.0);
 
-    vec4 final_pos = rot_mat * vec4(v_vertex * v_scale + v_position, 0.0, 1.0);
+    vec4 final_pos = rot_mat * vec4(v_vertex * v_scale, 0.0, 1.0) + vec4(v_position, 0.0, 0.0);
     gl_Position = u_projection * final_pos;
 })"
