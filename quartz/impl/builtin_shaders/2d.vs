@@ -14,7 +14,7 @@ out vec2 f_texturePos;
 out vec4 f_color;
 out float f_textureIndex;
 
-uniform mat4 u_projection;
+uniform mat3 u_projection;
 
 void main()
 {
@@ -23,11 +23,10 @@ void main()
     f_color = v_color;
     f_textureIndex = v_textureIndex;
 
-    mat4 rot_mat = mat4(cos(v_rotation), -sin(v_rotation), 0.0, 0.0,
-                        sin(v_rotation), cos(v_rotation), 0.0, 0.0,
-                        0.0, 0.0, 1.0, 0.0,
-                        0.0, 0.0, 0.0, 1.0);
+    mat3 rot_mat = mat3(cos(v_rotation), -sin(v_rotation), 0.0,
+                        sin(v_rotation), cos(v_rotation), 0.0,
+                        0.0, 0.0, 1.0);
 
-    vec4 final_pos = rot_mat * vec4(v_vertex * v_scale, 0.0, 1.0) + vec4(v_position, 0.0, 0.0);
-    gl_Position = u_projection * final_pos;
+    vec3 final_pos = rot_mat * vec3(v_vertex * v_scale, 1.0) + vec3(v_position, 0.0);
+    gl_Position = vec4(u_projection * final_pos, 1.0);
 })"

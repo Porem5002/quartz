@@ -38,7 +38,7 @@ struct quartz_renderer
 
     quartz_sprite quad_sprite;
     quartz_viewport viewport;
-    quartz_mat4 projection;
+    quartz_mat3 projection;
 };
 
 static quartz_renderer renderer;
@@ -54,13 +54,12 @@ quartz_camera2D quartz_init_camera2D(int width, int height)
     return camera;
 }
 
-quartz_mat4 quartz_camera2D_get_projection(const quartz_camera2D* camera)
+quartz_mat3 quartz_camera2D_get_projection(const quartz_camera2D* camera)
 {
-    return quartz_orth_proj(camera->x - camera->width / (2 * camera->zoom),
-                            camera->x + camera->width / (2 * camera->zoom),
-                            camera->y - camera->height / (2 * camera->zoom),
-                            camera->y + camera->height / (2 * camera->zoom),
-                            -1.0, 1.0);
+    return quartz_orth2d_projection(camera->x - camera->width / (2 * camera->zoom),
+                                    camera->x + camera->width / (2 * camera->zoom),
+                                    camera->y - camera->height / (2 * camera->zoom),
+                                    camera->y + camera->height / (2 * camera->zoom));
 }
 
 quartz_vec2 quartz_camera2D_to_world_through_viewport(const quartz_camera2D* camera, quartz_ivec2 position, quartz_viewport viewport)
@@ -284,7 +283,7 @@ void quartz_render_flush()
                renderer.viewport.get_width(), renderer.viewport.get_height());
 
     quartz_use_shader(renderer.shader);
-    glUniformMatrix4fv(renderer.u_projection, 1, GL_FALSE, &renderer.projection.values[0][0]);
+    glUniformMatrix3fv(renderer.u_projection, 1, GL_FALSE, &renderer.projection.values[0][0]);
 
     glBindBuffer(GL_ARRAY_BUFFER, renderer.instances_buffer_id);
     glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(quartz_instance_data) * renderer.batch_size, renderer.instances);

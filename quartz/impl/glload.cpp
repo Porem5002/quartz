@@ -16,6 +16,7 @@ static PFNGLUNIFORM3FVPROC glUniform3fv_ptr;
 static PFNGLUNIFORM4FVPROC glUniform4fv_ptr;
 static PFNGLUNIFORM1IPROC glUniform1i_ptr;
 static PFNGLUNIFORM1IVPROC glUniform1iv_ptr;
+static PFNGLUNIFORMMATRIX4FVPROC glUniformMatrix3fv_ptr;
 static PFNGLUNIFORMMATRIX4FVPROC glUniformMatrix4fv_ptr;
 static PFNGLVERTEXATTRIBDIVISORPROC glVertexAttribDivisor_ptr;
 static PFNGLACTIVETEXTUREPROC glActiveTexture_ptr;
@@ -76,6 +77,7 @@ void load_gl_functions()
     glUniform4fv_ptr = (PFNGLUNIFORM4FVPROC) load_gl_function_by_name("glUniform4fv");
     glUniform1i_ptr = (PFNGLUNIFORM1IPROC) load_gl_function_by_name("glUniform1i");
     glUniform1iv_ptr = (PFNGLUNIFORM1IVPROC) load_gl_function_by_name("glUniform1iv");
+    glUniformMatrix3fv_ptr = (PFNGLUNIFORMMATRIX3FVPROC) load_gl_function_by_name("glUniformMatrix3fv");
     glUniformMatrix4fv_ptr = (PFNGLUNIFORMMATRIX4FVPROC) load_gl_function_by_name("glUniformMatrix4fv");
     glVertexAttribDivisor_ptr = (PFNGLVERTEXATTRIBDIVISORPROC) load_gl_function_by_name("glVertexAttribDivisor");
     glActiveTexture_ptr = (PFNGLACTIVETEXTUREPROC) load_gl_function_by_name("glActiveTexture");
@@ -234,6 +236,11 @@ GLAPI void APIENTRY glUniform1i(GLint location, GLint v0)
 GLAPI void APIENTRY glUniform1iv(GLint location, GLsizei count, const GLint* value)
 {
     glUniform1iv_ptr(location, count, value);
+}
+
+GLAPI void APIENTRY glUniformMatrix3fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat* value)
+{
+    glUniformMatrix3fv_ptr(location, count, transpose, value);
 }
 
 GLAPI void APIENTRY glUniformMatrix4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat* value)

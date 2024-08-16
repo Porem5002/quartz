@@ -14,7 +14,7 @@ struct quartz_camera2D
 };
 
 quartz_camera2D quartz_init_camera2D(int width, int height);
-quartz_mat4 quartz_camera2D_get_projection(const quartz_camera2D* camera);
+quartz_mat3 quartz_camera2D_get_projection(const quartz_camera2D* camera);
 quartz_vec2 quartz_camera2D_to_world_through_viewport(const quartz_camera2D* camera, quartz_ivec2 position, quartz_viewport viewport);
 
 void quartz_render_init();

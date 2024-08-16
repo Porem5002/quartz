@@ -24,6 +24,7 @@ struct quartz_mat
     float values [Cols][Rows];
 };
 
+using quartz_mat3 = quartz_mat<3, 3>;
 using quartz_mat4 = quartz_mat<4, 4>;
 
 template<typename TNumber>
@@ -34,6 +35,7 @@ TNumber quartz_clamp(TNumber v, TNumber min, TNumber max)
     return v;
 }
 
-quartz_mat4 quartz_orth_proj(float left, float right, float bottom, float top, float near_, float far_);
+quartz_mat3 quartz_orth2d_projection(float left, float right, float bottom, float top);
+quartz_mat4 quartz_orth3d_projection(float left, float right, float bottom, float top, float near_, float far_);
 
 #endif
