@@ -9,23 +9,17 @@ constexpr float FIXED_DELTA_TIME = 1.0f / 144.0f;
 int main()
 {
     quartz_start(1280, 720, "Quartz Pong");
-
     quartz_set_vsync(true);
     quartz_set_fixed_delta_time(FIXED_DELTA_TIME);
-
-    quartz_render_init();
 
     game_data game = {};
 
     auto screen_vp = quartz_get_screen_viewport();
     auto game_vp = quartz_make_viewport(quartz_viewport_calc_boxed(screen_vp, game.WORLD_WIDTH, game.WORLD_HEIGHT));
 
-    quartz_camera2D cam = {};
-    cam.width = game.WORLD_WIDTH;
-    cam.height = game.WORLD_HEIGHT;
-    cam.zoom = 1.0f;
-    quartz_camera2D_recalc(&cam);
+    quartz_camera2D cam = quartz_init_camera2D(game.WORLD_WIDTH, game.WORLD_HEIGHT);
 
+    quartz_render_init();
     quartz_render_set_viewport(game_vp);
     quartz_render_set_camera(&cam);
 

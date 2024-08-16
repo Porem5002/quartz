@@ -21,7 +21,7 @@ struct quartz_renderer
     static constexpr size_t BATCH_CAP = 1000;
 
     quartz_shader shader;
-    unsigned int u_mvp;
+    unsigned int u_projection;
 
     unsigned int va_id;
     unsigned int vertex_buffer_id;
@@ -38,30 +38,40 @@ struct quartz_renderer
 
     quartz_sprite quad_sprite;
     quartz_viewport viewport;
+    quartz_mat4 projection;
 };
 
 static quartz_renderer renderer;
 
 static unsigned int quartz_render_push_new_texture(quartz_texture texture);
 
-void quartz_camera2D_recalc(quartz_camera2D* camera)
+quartz_camera2D quartz_init_camera2D(int width, int height)
 {
-    camera->projection = quartz_orth_proj(camera->x - camera->width / (2 * camera->zoom),
-                                          camera->x + camera->width / (2 * camera->zoom),
-                                          camera->y - camera->height / (2 * camera->zoom),
-                                          camera->y + camera->height / (2 * camera->zoom),
-                                          -1.0, 1.0);
+    quartz_camera2D camera = {};
+    camera.width = width;
+    camera.height = height;
+    camera.zoom = 1.0f;
+    return camera;
 }
 
-quartz_vec2 quartz_viewport_to_world2D(quartz_camera2D camera, quartz_ivec2 position, quartz_viewport viewport)
+quartz_mat4 quartz_camera2D_get_projection(const quartz_camera2D* camera)
 {
-    position = quartz_viewport_clamp_point(viewport, position); 
+    return quartz_orth_proj(camera->x - camera->width / (2 * camera->zoom),
+                            camera->x + camera->width / (2 * camera->zoom),
+                            camera->y - camera->height / (2 * camera->zoom),
+                            camera->y + camera->height / (2 * camera->zoom),
+                            -1.0, 1.0);
+}
+
+quartz_vec2 quartz_camera2D_to_world_through_viewport(const quartz_camera2D* camera, quartz_ivec2 position, quartz_viewport viewport)
+{
+    position = quartz_viewport_clamp_point(viewport, position);
 
     float norm_x = (float)(position.x - viewport.get_x()) / viewport.get_width() - 0.5f;
     float norm_y = (float)(position.y - viewport.get_y()) / viewport.get_height() - 0.5f;
 
-    float world_x = camera.x + norm_x * camera.width / camera.zoom;
-    float world_y = camera.y + norm_y * camera.height / camera.zoom;
+    float world_x = camera->x + norm_x * camera->width / camera->zoom;
+    float world_y = camera->y + norm_y * camera->height / camera->zoom;
 
     return quartz_vec2 { world_x, world_y };
 }
@@ -69,49 +79,16 @@ quartz_vec2 quartz_viewport_to_world2D(quartz_camera2D camera, quartz_ivec2 posi
 void quartz_render_init()
 {
     #if 1 // Section: Shader
-    static const char* vertex_shader = "#version 400 core\n"
-                                    "layout (location = 0) in vec2 v_vertex;\n"
-                                    "layout (location = 1) in vec2 v_uvMult;\n"
-                                    "layout (location = 2) in vec2 v_position;\n"
-                                    "layout (location = 3) in vec2 v_uvOffset;\n"
-                                    "layout (location = 4) in vec2 v_uvSize;\n"
-                                    "layout (location = 5) in vec2 v_scale;\n"
-                                    "layout (location = 6) in vec4 v_color;\n"
-                                    "layout (location = 7) in float v_rotation;\n"
-                                    "layout (location = 8) in float v_textureIndex;\n"
-                                    "out vec2 f_texturePos;\n"
-                                    "out vec4 f_color;\n"
-                                    "out float f_textureIndex;\n"
-                                    "uniform mat4 u_mvp;\n"
-                                    "void main()\n"
-                                    "{\n"
-                                        "f_texturePos = v_uvOffset + v_uvMult * v_uvSize;\n"
-                                        "f_texturePos.y = 1 - f_texturePos.y;\n"
-                                        "f_color = v_color;\n"
-                                        "f_textureIndex = v_textureIndex;\n"
+    static const char* vertex_shader =
+        #include "builtin_shaders\2d.vs"
+    ;
 
-                                        "mat4 rot_mat = mat4(cos(v_rotation), -sin(v_rotation), 0, 0,"
-                                                            "sin(v_rotation), cos(v_rotation), 0, 0,"
-                                                            "0, 0, 1, 0,"
-                                                            "0, 0, 0, 1);\n"
-
-                                        "vec4 final_pos = rot_mat * vec4(v_vertex * v_scale, 0, 1) + vec4(v_position, 0, 0);\n"
-                                        "gl_Position = u_mvp * final_pos;\n"
-                                    "}\n";
-
-    static const char* frag_shader = "#version 400 core\n"
-                                    "in vec2 f_texturePos;\n"
-                                    "in vec4 f_color;\n"
-                                    "in float f_textureIndex;\n"
-                                    "uniform sampler2D u_textures [32];\n"
-                                    "out vec4 fragColor;\n"
-                                    "void main()\n"
-                                    "{\n"
-                                        "fragColor = texture(u_textures[int(f_textureIndex)], f_texturePos) * f_color;\n"
-                                    "}\n";
+    static const char* frag_shader = 
+        #include "builtin_shaders\2d.fs"
+    ;
 
     renderer.shader = quartz_make_shader(vertex_shader, frag_shader);
-    renderer.u_mvp = glGetUniformLocation(renderer.shader, "u_mvp");
+    renderer.u_projection = glGetUniformLocation(renderer.shader, "u_projection");
     #endif
 
     renderer.batch_size = 0;
@@ -198,9 +175,13 @@ void quartz_render_init()
     // White pixel texture
     unsigned char quad_pixel [] = { 255, 255, 255, 255 };
     quartz_texture quad_texture = quartz_make_texture(1, 1, quad_pixel);
-
     renderer.quad_sprite = { quad_texture, {0,0}, {1, 1} };
-    renderer.viewport = quartz_get_screen_viewport();
+
+    quartz_viewport screen_vp = quartz_get_screen_viewport();
+    renderer.viewport = screen_vp;
+
+    quartz_camera2D default_camera = quartz_init_camera2D(screen_vp.get_width(), screen_vp.get_height());
+    renderer.projection = quartz_camera2D_get_projection(&default_camera);
 }
 
 void quartz_render_set_viewport(quartz_viewport viewport)
@@ -210,8 +191,7 @@ void quartz_render_set_viewport(quartz_viewport viewport)
 
 void quartz_render_set_camera(const quartz_camera2D* camera)
 {
-    quartz_use_shader(renderer.shader);
-    glUniformMatrix4fv(renderer.u_mvp, 1, GL_FALSE, &camera->projection.values[0][0]);
+    renderer.projection = quartz_camera2D_get_projection(camera);
 }
 
 static unsigned int quartz_render_push_new_texture(quartz_texture texture)
@@ -304,6 +284,7 @@ void quartz_render_flush()
                renderer.viewport.get_width(), renderer.viewport.get_height());
 
     quartz_use_shader(renderer.shader);
+    glUniformMatrix4fv(renderer.u_projection, 1, GL_FALSE, &renderer.projection.values[0][0]);
 
     glBindBuffer(GL_ARRAY_BUFFER, renderer.instances_buffer_id);
     glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(quartz_instance_data) * renderer.batch_size, renderer.instances);

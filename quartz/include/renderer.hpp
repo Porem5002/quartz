@@ -11,14 +11,11 @@ struct quartz_camera2D
     float x, y;
     float width, height;
     float zoom;
-
-    quartz_mat4 projection;
 };
 
-void quartz_camera2D_recalc(quartz_camera2D* camera);
-
-// TODO: Change name of 'quartz_viewport_to_world2D'
-quartz_vec2 quartz_viewport_to_world2D(quartz_camera2D camera, quartz_ivec2 position, quartz_viewport viewport);
+quartz_camera2D quartz_init_camera2D(int width, int height);
+quartz_mat4 quartz_camera2D_get_projection(const quartz_camera2D* camera);
+quartz_vec2 quartz_camera2D_to_world_through_viewport(const quartz_camera2D* camera, quartz_ivec2 position, quartz_viewport viewport);
 
 void quartz_render_init();
 void quartz_render_set_viewport(quartz_viewport viewport);
