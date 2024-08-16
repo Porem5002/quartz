@@ -28,7 +28,7 @@ struct game_data
 
     game_mode mode = game_mode::START;
     player p1 = { {-250, 0}, P1_COLOR, QUARTZ_KEY_W, QUARTZ_KEY_S };
-    player p2 = { {250, 0}, P2_COLOR, QUARTZ_KEY_U, QUARTZ_KEY_J };
+    player p2 = { {250, 0}, P2_COLOR, QUARTZ_KEY_ARROW_UP, QUARTZ_KEY_ARROW_DOWN };
     ball b = {};
 
     void update()

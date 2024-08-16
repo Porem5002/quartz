@@ -7,11 +7,46 @@ enum  quartz_keycode : size_t
 {
     QUARTZ_KEY_NONE,
 
+    // Mouse Buttons
     QUARTZ_KEY_L_MOUSE_BTN,
     QUARTZ_KEY_R_MOUSE_BTN,
     QUARTZ_KEY_M_MOUSE_BTN,
+    QUARTZ_KEY_X1_MOUSE_BTN,
+    QUARTZ_KEY_X2_MOUSE_BTN,
 
-    QUARTZ_KEY_0,
+    QUARTZ_KEY_BACK,
+    QUARTZ_KEY_ENTER,
+
+    QUARTZ_KEY_ESC,
+    QUARTZ_KEY_TAB,
+    QUARTZ_KEY_CAPSLOCK,
+    QUARTZ_KEY_SHIFT,
+    QUARTZ_KEY_CTRL,
+    QUARTZ_KEY_ALT,
+    QUARTZ_KEY_SPACE,
+
+    //Function keys
+    QUARTZ_KEY_F1,
+    QUARTZ_KEY_F2,
+    QUARTZ_KEY_F3,
+    QUARTZ_KEY_F4,
+    QUARTZ_KEY_F5,
+    QUARTZ_KEY_F6,
+    QUARTZ_KEY_F7,
+    QUARTZ_KEY_F8,
+    QUARTZ_KEY_F9,
+    QUARTZ_KEY_F10, // TODO: Check why F10 state is not received
+    QUARTZ_KEY_F11,
+    QUARTZ_KEY_F12,
+
+    // Arrow Keys
+    QUARTZ_KEY_ARROW_UP,
+    QUARTZ_KEY_ARROW_DOWN,
+    QUARTZ_KEY_ARROW_LEFT,
+    QUARTZ_KEY_ARROW_RIGHT,
+
+    // Number Keys
+    QUARTZ_KEY_0 = '0',
     QUARTZ_KEY_1,
     QUARTZ_KEY_2,
     QUARTZ_KEY_3,
@@ -22,7 +57,8 @@ enum  quartz_keycode : size_t
     QUARTZ_KEY_8,
     QUARTZ_KEY_9,
 
-    QUARTZ_KEY_A,
+    // Letter Keys
+    QUARTZ_KEY_A = 'A',
     QUARTZ_KEY_B,
     QUARTZ_KEY_C,
     QUARTZ_KEY_D,
@@ -49,10 +85,7 @@ enum  quartz_keycode : size_t
     QUARTZ_KEY_Y,
     QUARTZ_KEY_Z,
 
-    QUARTZ_KEY_BACK,
-    QUARTZ_KEY_TAB,
-    QUARTZ_KEY_SPACE,
-
+    // Numpad Number Keys
     QUARTZ_KEY_NUMPAD_0,
     QUARTZ_KEY_NUMPAD_1,
     QUARTZ_KEY_NUMPAD_2,

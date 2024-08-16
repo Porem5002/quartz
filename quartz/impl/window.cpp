@@ -203,6 +203,14 @@ static LRESULT CALLBACK quartz_windows_window_callback(HWND window, UINT msg, WP
         case WM_MBUTTONUP:
             quartz_register_key(QUARTZ_KEY_M_MOUSE_BTN, msg == WM_MBUTTONUP);
             break;
+        case WM_XBUTTONDOWN:
+        case WM_XBUTTONUP:
+        {
+            quartz_keycode key = GET_XBUTTON_WPARAM(wParam) == 1 ?
+                QUARTZ_KEY_X1_MOUSE_BTN : QUARTZ_KEY_X2_MOUSE_BTN;
+            quartz_register_key(key, msg == WM_XBUTTONUP);
+            break;
+        }
         case WM_KEYDOWN:
         case WM_KEYUP:
         {
@@ -220,20 +228,39 @@ static LRESULT CALLBACK quartz_windows_window_callback(HWND window, UINT msg, WP
 
 static quartz_keycode quartz_windows_map_key(WPARAM virtual_key)
 {
-    if(virtual_key >= 0x30 && virtual_key <= 0x39)
-        return (quartz_keycode)(QUARTZ_KEY_0 + (virtual_key - 0x30));
-
-    if(virtual_key >= 0x41 && virtual_key <= 0x5A)
-        return (quartz_keycode)(QUARTZ_KEY_A + (virtual_key - 0x41));
+    // Windows uses the ASCII codes of digits and letters to represent their respective keys,
+    // since we do the same for ours, we can directly map them 
+    if(virtual_key >= '0' && virtual_key <= '9') return (quartz_keycode)virtual_key;
+    if(virtual_key >= 'A' && virtual_key <= 'Z') return (quartz_keycode)virtual_key;
 
     if(virtual_key >= VK_NUMPAD0 && virtual_key <= VK_NUMPAD9)
         return (quartz_keycode)(QUARTZ_KEY_NUMPAD_0 + (virtual_key - VK_NUMPAD0));
 
-    if(virtual_key == VK_BACK) return QUARTZ_KEY_BACK;
-    if(virtual_key == VK_TAB) return QUARTZ_KEY_TAB;
-    if(virtual_key == VK_SPACE) return QUARTZ_KEY_SPACE;
+    if(virtual_key >= VK_F1 && virtual_key <= VK_F12)
+        return (quartz_keycode)(QUARTZ_KEY_F1 + (virtual_key - VK_F1));
 
-    return QUARTZ_KEY_NONE;
+    switch(virtual_key)
+    {
+        case VK_BACK: return QUARTZ_KEY_BACK;
+        case VK_RETURN: return QUARTZ_KEY_ENTER;
+
+        case VK_ESCAPE: return QUARTZ_KEY_ESC;
+        case VK_TAB: return QUARTZ_KEY_TAB;
+        case VK_CAPITAL: return QUARTZ_KEY_CAPSLOCK;
+        case VK_SHIFT: return QUARTZ_KEY_SHIFT;
+        case VK_CONTROL: return QUARTZ_KEY_CTRL;
+        case VK_MENU: return QUARTZ_KEY_ALT;
+        case VK_SPACE: return QUARTZ_KEY_SPACE;
+
+        case VK_UP:  return QUARTZ_KEY_ARROW_UP;
+        case VK_DOWN: return QUARTZ_KEY_ARROW_DOWN;
+        case VK_LEFT: return QUARTZ_KEY_ARROW_LEFT;
+        case VK_RIGHT: return QUARTZ_KEY_ARROW_RIGHT;
+
+        default: return QUARTZ_KEY_NONE;
+    }
+
+    QUARTZ_ASSERT(false, "Unreachable");
 }
 
 #endif
