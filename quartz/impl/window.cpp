@@ -1,4 +1,5 @@
-#include "../include/glload.hpp"
+#include <gapil.h>
+
 #include "../include/common.hpp"
 #include "../include/window.hpp"
 #include "../include/input.hpp"
@@ -55,7 +56,7 @@ quartz_window quartz_window_create(int width, int height, const char* title)
         QUARTZ_ASSERT(q_window.win_rc != NULL, "Failed to create opengl context!");
         QUARTZ_ASSERT(wglMakeCurrent(q_window.win_dc, q_window.win_rc) != 0, "Failed to make current!");
 
-        load_wgl_functions();
+        gapil_load();
 
         // Cleanup temporary contexts
         wglMakeCurrent(q_window.win_dc, 0);

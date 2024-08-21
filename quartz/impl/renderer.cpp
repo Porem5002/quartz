@@ -1,6 +1,7 @@
 #include <cstring>
 
-#include "../include/glinclude.hpp"
+#include <gapil.h>
+
 #include "../include/renderer.hpp"
 #include "../include/common.hpp"
 #include "../include/quartz.hpp"

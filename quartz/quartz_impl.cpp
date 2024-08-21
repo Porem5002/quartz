@@ -1,4 +1,3 @@
-#include "impl/glload.cpp"
 #include "impl/quartz.cpp"
 #include "impl/math.cpp"
 #include "impl/renderer.cpp"
@@ -9,3 +8,6 @@
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
+
+#define GAPIL_IMPLEMENTATION
+#include <gapil.h>

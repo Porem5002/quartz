@@ -10,7 +10,7 @@ endif()
 
 # Library
 add_library(quartz STATIC "quartz/quartz_impl.cpp")
-target_include_directories(quartz PRIVATE "third_party/")
+target_include_directories(quartz PRIVATE "third_party/" "third_party/GL/")
 target_link_libraries(quartz PRIVATE user32 opengl32 gdi32)
 
 # Examples

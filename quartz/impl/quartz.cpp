@@ -4,10 +4,9 @@
 #include <malloc.h>
 
 #include <stb_image.h>
+#include <gapil.h>
 
 #include "../include/quartz.hpp"
-#include "../include/glload.hpp"
-#include "../include/glinclude.hpp"
 #include "../include/window.hpp"
 #include "../include/input.hpp"
 
@@ -55,7 +54,7 @@ void quartz_start(int width, int height, const char* title)
 {
     context.window = quartz_window_create(width, height, title);
 
-    load_gl_functions();
+    gapil_load();
 
     glDebugMessageCallback(&quartz_gl_debug_callback, nullptr);
     glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
