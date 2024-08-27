@@ -33,7 +33,7 @@ struct player
 
     void draw()
     {
-        quartz_render_quad(color, position, SIZE);
+        quartz_render2D_quad(color, position, SIZE);
     }
 };
 

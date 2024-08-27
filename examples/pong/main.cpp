@@ -19,9 +19,9 @@ int main()
 
     quartz_camera2D cam = quartz_init_camera2D(game.WORLD_WIDTH, game.WORLD_HEIGHT);
 
-    quartz_render_init();
-    quartz_render_set_viewport(game_vp);
-    quartz_render_set_camera(&cam);
+    quartz_render2D_init();
+    quartz_render2D_set_viewport(game_vp);
+    quartz_render2D_set_camera(&cam);
 
     while(quartz_update())
     {
@@ -35,7 +35,7 @@ int main()
 
         quartz_clear(QUARTZ_BLACK);
         game.draw();
-        quartz_render_flush();
+        quartz_render2D_flush();
     }
 
     return 0;

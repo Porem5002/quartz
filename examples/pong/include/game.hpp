@@ -87,7 +87,7 @@ struct game_data
 
     void draw()
     {
-        quartz_render_quad(BG_COLOR, {0, 0}, {(float)WORLD_WIDTH, (float)WORLD_HEIGHT});
+        quartz_render2D_quad(BG_COLOR, {0, 0}, {(float)WORLD_WIDTH, (float)WORLD_HEIGHT});
 
         b.draw();
         p1.draw();
@@ -97,7 +97,7 @@ struct game_data
         draw_points_for_player(p2, 1);
         
         if(mode != game_mode::PLAYING)
-            quartz_render_quad(PAUSE_PANEL_COLOR, {0, 0}, {(float)WORLD_WIDTH, (float)WORLD_HEIGHT});
+            quartz_render2D_quad(PAUSE_PANEL_COLOR, {0, 0}, {(float)WORLD_WIDTH, (float)WORLD_HEIGHT});
     }
 
     void draw_points_for_player(const player& p, float dir_x)
@@ -105,7 +105,7 @@ struct game_data
         for(int i = 0; i < game_data::POINTS_TO_WIN; i++)
         {
             quartz_color color = p.points >= (i + 1) ? p.color : QUARTZ_WHITE;
-            quartz_render_quad(color, { dir_x * (30.0f + 10.0f * (i + 1)), 180 }, { 5, 15 });
+            quartz_render2D_quad(color, { dir_x * (30.0f + 10.0f * (i + 1)), 180 }, { 5, 15 });
         }
     }
 };

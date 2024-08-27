@@ -1,3 +1,5 @@
+#include <string>
+#include <sstream>
 
 #include <vector>
 #include <chrono>
@@ -6,13 +8,16 @@
 #include <stb_image.h>
 #include <gapil.h>
 
-#include "../include/quartz.hpp"
+#include "../include/base.hpp"
 #include "../include/window.hpp"
 #include "../include/input.hpp"
+#include "../include/gfx_info.hpp"
 
-struct quartz_context
+struct quartz_base
 {
     static constexpr float DEFAULT_FIXED_DELTA_TIME = 1.0f / 60.0f;
+
+    std::string shader_defines;
 
     float delta_time;
 
@@ -28,21 +33,21 @@ struct quartz_context
     quartz_window window;
 };
 
-quartz_context context;
+static quartz_base base_context = {};
 
 quartz_texture_info quartz_texture::get() const
 {
-    return context.textures[this->id];
+    return base_context.textures[this->id];
 }
 
 void quartz_viewport::set(quartz_viewport_info val)
 {
-    context.viewports[this->id] = val;
+    base_context.viewports[this->id] = val;
 }
 
 quartz_viewport_info quartz_viewport::get() const
 {
-    return context.viewports[this->id];
+    return base_context.viewports[this->id];
 }
 
 static void APIENTRY quartz_gl_debug_callback(GLenum source, GLenum type, 
@@ -52,7 +57,7 @@ static void APIENTRY quartz_gl_debug_callback(GLenum source, GLenum type,
 
 void quartz_start(int width, int height, const char* title)
 {
-    context.window = quartz_window_create(width, height, title);
+    base_context.window = quartz_window_create(width, height, title);
 
     gapil_load();
 
@@ -60,12 +65,17 @@ void quartz_start(int width, int height, const char* title)
     glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
     glEnable(GL_DEBUG_OUTPUT);
 
+    // Setup defines for shaders so that they take into consideration the platforms capabilities
+    std::stringstream s;
+    s << "\n#define QUARTZ_TEXTURE_UNIT_CAP " << quartz_gfx_get_texture_unit_cap() << "\n";
+    base_context.shader_defines = s.str();
+
     // Default Config
     quartz_set_vsync(true);
-    context.is_fixed_update = false;
-    context.fixed_delta_time = context.DEFAULT_FIXED_DELTA_TIME;
-    context.fixed_accumulator = 0.0f;
-    context.screen_viewport = quartz_make_viewport({ 0, 0, context.window.size.x, context.window.size.y });
+    base_context.is_fixed_update = false;
+    base_context.fixed_delta_time = base_context.DEFAULT_FIXED_DELTA_TIME;
+    base_context.fixed_accumulator = 0.0f;
+    base_context.screen_viewport = quartz_make_viewport({ 0, 0, base_context.window.size.x, base_context.window.size.y });
 }
 
 bool quartz_update()
@@ -75,7 +85,7 @@ bool quartz_update()
     if(running)
     {
         // End Last Frame
-        quartz_window_swap_buffers(&context.window);
+        quartz_window_swap_buffers(&base_context.window);
 
         // Start Current Frame
         static auto last_time = std::chrono::system_clock::now();
@@ -84,16 +94,16 @@ bool quartz_update()
         float delta_time = std::chrono::duration<float>(curr_time - last_time).count();
         last_time = curr_time;
 
-        context.delta_time = delta_time;
-        context.fixed_accumulator += delta_time;
+        base_context.delta_time = delta_time;
+        base_context.fixed_accumulator += delta_time;
 
         quartz_update_key_states();
-        quartz_window_update(&context.window);
+        quartz_window_update(&base_context.window);
 
         if(quartz_was_screen_resized())
         {
             auto screen_size = quartz_get_screen_size();
-            context.screen_viewport.set({ 0, 0, screen_size.x, screen_size.y });
+            base_context.screen_viewport.set({ 0, 0, screen_size.x, screen_size.y });
         }
     }
 
@@ -102,12 +112,12 @@ bool quartz_update()
 
 bool quartz_fixed_update()
 {
-    context.is_fixed_update = context.fixed_accumulator >= context.fixed_delta_time;
+    base_context.is_fixed_update = base_context.fixed_accumulator >= base_context.fixed_delta_time;
 
-    if(context.is_fixed_update)
-        context.fixed_accumulator -= context.fixed_delta_time;
+    if(base_context.is_fixed_update)
+        base_context.fixed_accumulator -= base_context.fixed_delta_time;
 
-    return context.is_fixed_update;
+    return base_context.is_fixed_update;
 }
 
 void quartz_set_vsync(bool active)
@@ -117,37 +127,37 @@ void quartz_set_vsync(bool active)
 
 void quartz_set_fixed_delta_time(float fixed_delta_time)
 {
-    context.fixed_delta_time = fixed_delta_time;
+    base_context.fixed_delta_time = fixed_delta_time;
 }
 
 bool quartz_is_running()
 {
-    return context.window.running;
+    return base_context.window.running;
 }
 
 float quartz_get_delta_time()
 {
-    return context.is_fixed_update ? context.fixed_delta_time : context.delta_time;
+    return base_context.is_fixed_update ? base_context.fixed_delta_time : base_context.delta_time;
 }
 
 bool quartz_was_screen_resized()
 {
-    return context.window.resized;
+    return base_context.window.resized;
 }
 
 quartz_ivec2 quartz_get_screen_size()
 {
-    return context.window.size;
+    return base_context.window.size;
 }
 
 quartz_viewport quartz_get_screen_viewport()
 {
-    return context.screen_viewport;
+    return base_context.screen_viewport;
 }
 
 quartz_ivec2 quartz_get_mouse_pos()
 {
-    return context.window.mouse_pos;
+    return base_context.window.mouse_pos;
 }
 
 quartz_shader quartz_make_shader(const char* vs_code, const char* fs_code)
@@ -199,8 +209,8 @@ quartz_texture quartz_make_texture(int width, int height, unsigned char* data)
     texture_info.height = height;
     texture_info.channels = 4;
 
-    quartz_texture texture = { context.textures.size() };
-    context.textures.push_back(texture_info);
+    quartz_texture texture = { base_context.textures.size() };
+    base_context.textures.push_back(texture_info);
     return texture;
 }
 
@@ -212,15 +222,25 @@ void quartz_bind_texture(quartz_texture texture, unsigned int slot)
 
 quartz_viewport quartz_make_viewport(quartz_viewport_info init_val = { 0, 0, 0, 0 })
 {
-    quartz_viewport viewport = { context.viewports.size() };
-    context.viewports.push_back(init_val);
+    quartz_viewport viewport = { base_context.viewports.size() };
+    base_context.viewports.push_back(init_val);
     return viewport;
 }
 
 unsigned int quartz_shader_from_source(unsigned int shader_type, const char* shader_src)
 {
+    const char* usage_symbol = "QUARTZ_USE_DEFINES";
+    std::string src_with_defines = shader_src;
+
+    // Inserts quartz specific macros into shader if QUARTZ_USE_DEFINES exists, replacing it with the defines
+    size_t replacement_index = src_with_defines.find(usage_symbol);
+    if(replacement_index != std::string::npos)
+        src_with_defines.replace(replacement_index, strlen(usage_symbol), base_context.shader_defines);
+
+    const char* final_shader_src = src_with_defines.c_str();
+
     GLuint id = glCreateShader(shader_type);
-    glShaderSource(id, 1, &shader_src, nullptr);
+    glShaderSource(id, 1, &final_shader_src, nullptr);
     quartz_compile_shader(id);
     return id;
 }
