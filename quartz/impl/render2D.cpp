@@ -14,6 +14,7 @@ struct quartz_render2D
 
     struct instance_data
     {
+        float mode;
         quartz_vec2 pos;
         quartz_vec2 uv_offset;
         quartz_vec2 uv_size;
@@ -148,32 +149,36 @@ void quartz_render2D_init()
     glBufferData(GL_ARRAY_BUFFER, sizeof(instance_data) * render2D_context.INSTANCE_CAP, nullptr, GL_DYNAMIC_DRAW);
     
     glEnableVertexAttribArray(2);
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(instance_data), (const void*)offsetof(instance_data, pos));
+    glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, sizeof(instance_data), (const void*)offsetof(instance_data, mode));
     glVertexAttribDivisor(2, 1);
 
     glEnableVertexAttribArray(3);
-    glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(instance_data), (const void*)offsetof(instance_data, uv_offset));
+    glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(instance_data), (const void*)offsetof(instance_data, pos));
     glVertexAttribDivisor(3, 1);
 
     glEnableVertexAttribArray(4);
-    glVertexAttribPointer(4, 2, GL_FLOAT, GL_FALSE, sizeof(instance_data), (const void*)offsetof(instance_data, uv_size));
+    glVertexAttribPointer(4, 2, GL_FLOAT, GL_FALSE, sizeof(instance_data), (const void*)offsetof(instance_data, uv_offset));
     glVertexAttribDivisor(4, 1);
-    
-    glEnableVertexAttribArray(5);
-    glVertexAttribPointer(5, 2, GL_FLOAT, GL_FALSE, sizeof(instance_data), (const void*)offsetof(instance_data, scale));
-    glVertexAttribDivisor(5, 1);
 
+    glEnableVertexAttribArray(5);
+    glVertexAttribPointer(5, 2, GL_FLOAT, GL_FALSE, sizeof(instance_data), (const void*)offsetof(instance_data, uv_size));
+    glVertexAttribDivisor(5, 1);
+    
     glEnableVertexAttribArray(6);
-    glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, sizeof(instance_data), (const void*)offsetof(instance_data, color));
+    glVertexAttribPointer(6, 2, GL_FLOAT, GL_FALSE, sizeof(instance_data), (const void*)offsetof(instance_data, scale));
     glVertexAttribDivisor(6, 1);
 
     glEnableVertexAttribArray(7);
-    glVertexAttribPointer(7, 1, GL_FLOAT, GL_FALSE, sizeof(instance_data), (const void*)offsetof(instance_data, rotation));
+    glVertexAttribPointer(7, 4, GL_FLOAT, GL_FALSE, sizeof(instance_data), (const void*)offsetof(instance_data, color));
     glVertexAttribDivisor(7, 1);
 
     glEnableVertexAttribArray(8);
-    glVertexAttribPointer(8, 1, GL_FLOAT, GL_FALSE, sizeof(instance_data), (const void*)offsetof(instance_data, slot_index));
+    glVertexAttribPointer(8, 1, GL_FLOAT, GL_FALSE, sizeof(instance_data), (const void*)offsetof(instance_data, rotation));
     glVertexAttribDivisor(8, 1);
+
+    glEnableVertexAttribArray(9);
+    glVertexAttribPointer(9, 1, GL_FLOAT, GL_FALSE, sizeof(instance_data), (const void*)offsetof(instance_data, slot_index));
+    glVertexAttribDivisor(9, 1);
 
     glBindVertexArray(0);
     #endif
@@ -233,22 +238,7 @@ static unsigned int quartz_render2D_push_new_texture(quartz_texture texture)
     return slot;
 }
 
-void quartz_render2D_texture(quartz_texture texture, quartz_vec2 pos, quartz_vec2 scale, float rotation, quartz_color tint)
-{
-    unsigned int slot = quartz_render2D_push_new_texture(texture);
-
-    if(render2D_context.instance_count == render2D_context.INSTANCE_CAP)
-        quartz_render2D_flush();
-
-    quartz_render2D::instance_data instance = {
-        pos, {0,0}, {1,1}, { texture.get_width() * scale.x, texture.get_height() * scale.y}, tint, rotation, (float)slot
-    };
-
-    render2D_context.instances[render2D_context.instance_count] = instance;
-    render2D_context.instance_count++;
-}
-
-void quartz_render2D_sprite(quartz_sprite sprite, quartz_vec2 pos, quartz_vec2 scale, float rotation, quartz_color tint)
+void quartz_render2D_sprite_ex(quartz_primitive2D primitive, quartz_sprite sprite, quartz_vec2 pos, quartz_vec2 scale, float rotation, quartz_color tint)
 {
     unsigned int slot = quartz_render2D_push_new_texture(sprite.atlas);
 
@@ -266,16 +256,43 @@ void quartz_render2D_sprite(quartz_sprite sprite, quartz_vec2 pos, quartz_vec2 s
     };
 
     quartz_render2D::instance_data instance = {
-        pos, uv_offset, uv_size, {(float)sprite.size.x * scale.x, (float)sprite.size.y * scale.y}, tint, rotation, (float)slot
+        (float)primitive, pos, uv_offset, uv_size,
+        {(float)sprite.size.x * scale.x, (float)sprite.size.y * scale.y},
+        tint, rotation, (float)slot
     };
 
     render2D_context.instances[render2D_context.instance_count] = instance;
     render2D_context.instance_count++;
 }
 
+void quartz_render2D_texture_ex(quartz_primitive2D primitive, quartz_texture texture, quartz_vec2 pos, quartz_vec2 scale, float rotation, quartz_color tint)
+{
+    quartz_sprite sprite = {};
+    sprite.atlas = texture;
+    sprite.offset = {0,0};
+    sprite.size = {(unsigned int)texture.get_width(), (unsigned int)texture.get_height()};
+    quartz_render2D_sprite_ex(primitive, sprite, pos, scale, rotation, tint);
+}
+
+void quartz_render2D_sprite(quartz_sprite sprite, quartz_vec2 pos, quartz_vec2 scale, float rotation, quartz_color tint)
+{
+    quartz_render2D_sprite_ex(QUARTZ_PRIMITIVE2D_QUAD, sprite, pos, scale, rotation, tint);
+}
+
+void quartz_render2D_texture(quartz_texture texture, quartz_vec2 pos, quartz_vec2 scale, float rotation, quartz_color tint)
+{
+    quartz_render2D_texture_ex(QUARTZ_PRIMITIVE2D_QUAD, texture, pos, scale, rotation, tint);
+}
+
 void quartz_render2D_quad(quartz_color color, quartz_vec2 pos, quartz_vec2 scale, float rotation)
 {
-    quartz_render2D_sprite(render2D_context.quad_sprite, pos, scale, rotation, color);
+    quartz_render2D_sprite_ex(QUARTZ_PRIMITIVE2D_QUAD, render2D_context.quad_sprite, pos, scale, rotation, color);
+}
+
+void quartz_render2D_circle(quartz_color color, quartz_vec2 pos, float radius)
+{
+    float diameter = radius * 2.0f;
+    quartz_render2D_sprite_ex(QUARTZ_PRIMITIVE2D_CIRCLE, render2D_context.quad_sprite, pos, {diameter, diameter}, 0.0f, color);
 }
 
 void quartz_render2D_flush()
