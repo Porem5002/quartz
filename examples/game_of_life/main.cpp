@@ -74,10 +74,12 @@ int main()
             }
         }
 
+        // Simulation code running on a fixed time step
         while(quartz_fixed_update())
         {
             if(mode != game_mode::SIMULATION) continue;
 
+            // Resolve cell states
             foreach_xy()
             {
                 cell_data& cell = cells[x][y];
@@ -89,6 +91,7 @@ int main()
                 }
             }
 
+            // Prepare next step
             foreach_xy()
             {
                 quartz_ivec2 coords = {x, y};
@@ -116,6 +119,8 @@ int main()
             }
         }
 
+        // With the current implementation we check every cell individually to see if it is being hovered
+        // this is used to only allow one cell to be hover even if the mouse is on the edge of two or more cells
         bool hovered_cell_this_frame = false;
 
         foreach_xy()
