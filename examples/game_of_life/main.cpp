@@ -24,11 +24,14 @@ SOFTWARE.
 
 #include <quartz.hpp>
 
+constexpr int BASE_SCREEN_SIDE = 500;
+
 constexpr int SIDE_CELL_COUNT = 50;
 constexpr float TICK_COOLDOWN = 0.1f;
 
 constexpr quartz_color ALIVE_COLOR = QUARTZ_WHITE;
-constexpr quartz_color DEAD_COLOR = QUARTZ_BLACK;
+constexpr quartz_color DEAD_COLOR = { 0.5, 0.5, 0.5, 1.0 };
+constexpr quartz_color MARGIN_COLOR = QUARTZ_BLACK;
 
 constexpr quartz_color VALID_EDIT_COLOR = { 0.0, 1.0, 0.0, 0.7 };
 constexpr quartz_color INVALID_EDIT_COLOR = { 1.0, 0.0, 0.0, 0.7 };
@@ -67,10 +70,11 @@ static quartz_ivec2 neighbour_offsets [8] = {
 
 int main()
 {
-    quartz_start(500, 500, "Game Of Life");
+    quartz_start(BASE_SCREEN_SIDE, BASE_SCREEN_SIDE, "Game Of Life");
     quartz_set_fixed_delta_time(TICK_COOLDOWN);
 
     auto screen_vp = quartz_get_screen_viewport();
+    auto world_vp = quartz_make_viewport(quartz_viewport_calc_boxed(screen_vp, BASE_SCREEN_SIDE, BASE_SCREEN_SIDE));
 
     quartz_camera2D camera = quartz_init_camera2D(SIDE_CELL_COUNT, SIDE_CELL_COUNT);
     camera.x = SIDE_CELL_COUNT / 2.0 - 0.5;
@@ -78,13 +82,17 @@ int main()
 
     quartz_render2D_init();
     quartz_render2D_set_camera(&camera);
+    quartz_render2D_set_viewport(world_vp);
 
     while(quartz_update())
     {
-        quartz_clear(DEAD_COLOR);
+        if(quartz_was_screen_resized())
+        {
+            world_vp.set(quartz_viewport_calc_boxed(screen_vp, BASE_SCREEN_SIDE, BASE_SCREEN_SIDE));
+        }
 
         quartz_ivec2 screen_mouse_pos = quartz_get_mouse_pos();
-        quartz_vec2 mouse_pos = quartz_camera2D_to_world_through_viewport(&camera, screen_mouse_pos, screen_vp);
+        quartz_vec2 mouse_pos = quartz_camera2D_to_world_through_viewport(&camera, screen_mouse_pos, world_vp);
 
         if(quartz_is_key_down(QUARTZ_KEY_SPACE))
         {
@@ -146,6 +154,9 @@ int main()
         // With the current implementation we check every cell individually to see if it is being hovered
         // this is used to only allow one cell to be hover even if the mouse is on the edge of two or more cells
         bool hovered_cell_this_frame = false;
+
+        quartz_clear(MARGIN_COLOR);
+        quartz_render2D_quad(DEAD_COLOR, {camera.x, camera.y}, {SIDE_CELL_COUNT, SIDE_CELL_COUNT});
 
         foreach_xy()
         {
