@@ -91,7 +91,7 @@ quartz_mat3 quartz_camera2D_get_projection(const quartz_camera2D* camera)
 
 quartz_vec2 quartz_camera2D_to_world_through_viewport(const quartz_camera2D* camera, quartz_ivec2 position, quartz_viewport viewport)
 {
-    position = quartz_viewport_clamp_point(viewport, position);
+    position = quartz_rect_clamp_point(viewport.get_rect(), position);
 
     float norm_x = (float)(position.x - viewport.get_x()) / viewport.get_width() - 0.5f;
     float norm_y = (float)(position.y - viewport.get_y()) / viewport.get_height() - 0.5f;

@@ -39,7 +39,7 @@ int main()
     game_data game = {};
 
     auto screen_vp = quartz_get_screen_viewport();
-    auto game_vp = quartz_make_viewport(quartz_viewport_calc_boxed(screen_vp, game.WORLD_WIDTH, game.WORLD_HEIGHT));
+    auto game_vp = quartz_make_viewport();
 
     quartz_camera2D cam = quartz_init_camera2D(game.WORLD_WIDTH, game.WORLD_HEIGHT);
 
@@ -49,8 +49,11 @@ int main()
 
     while(quartz_update())
     {
-        if(quartz_was_screen_resized())
-            game_vp.set(quartz_viewport_calc_boxed(screen_vp, game.WORLD_WIDTH, game.WORLD_HEIGHT));
+        if(quartz_is_startup() || quartz_was_screen_resized())
+        {
+            quartz_rect r = quartz_rect_calc_boxed(screen_vp.get_rect(), (float)game.WORLD_WIDTH / game.WORLD_HEIGHT);
+            quartz_viewport_set_rect(game_vp, r);
+        }
 
         game.update();
 

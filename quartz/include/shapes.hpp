@@ -27,6 +27,15 @@ SOFTWARE.
 
 #include "math.hpp"
 
+struct quartz_rect
+{
+    int x, y;
+    int width, height;
+};
+
+quartz_rect quartz_rect_calc_boxed(quartz_rect rect, float aspect_ratio);
+quartz_ivec2 quartz_rect_clamp_point(quartz_rect rect, quartz_ivec2 point);
+
 struct quartz_aabb2
 {
     float x, y;

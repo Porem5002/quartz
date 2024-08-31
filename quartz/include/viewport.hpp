@@ -28,24 +28,19 @@ SOFTWARE.
 #include <cstdlib>
 
 #include "math.hpp"
-
-struct quartz_viewport_info
-{
-    int x, y;
-    int width, height;
-};
+#include "shapes.hpp"
 
 struct quartz_viewport
 {
     size_t id;
     
-    void set(quartz_viewport_info val);
-    quartz_viewport_info get() const;
+    void set_rect(quartz_rect rect);
+    quartz_rect get_rect() const;
 
-    int get_x() const { return get().x; }
-    int get_y() const { return get().y; }
-    int get_width() const { return get().width; }
-    int get_height() const { return get().height; }
+    int get_x() const { return get_rect().x; }
+    int get_y() const { return get_rect().y; }
+    int get_width() const { return get_rect().width; }
+    int get_height() const { return get_rect().height; }
 
     bool operator ==(quartz_viewport other) const
     {
@@ -58,7 +53,17 @@ struct quartz_viewport
     }
 };
 
-quartz_viewport_info quartz_viewport_calc_boxed(quartz_viewport container, int content_width, int content_height);
-quartz_ivec2 quartz_viewport_clamp_point(quartz_viewport container, quartz_ivec2 point);
+void quartz_viewport_set_rect(quartz_viewport vp, quartz_rect rect);
+quartz_rect quartz_viewport_get_rect(quartz_viewport vp);
+
+inline void quartz_viewport::set_rect(quartz_rect rect)
+{
+    quartz_viewport_set_rect(*this, rect);
+}
+
+inline quartz_rect quartz_viewport::get_rect() const
+{
+    return quartz_viewport_get_rect(*this);
+}
 
 #endif

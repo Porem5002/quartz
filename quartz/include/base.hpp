@@ -38,6 +38,7 @@ bool quartz_fixed_update();
 void quartz_set_vsync(bool active);
 void quartz_set_fixed_delta_time(float fixed_delta_time);
 
+bool quartz_is_startup();
 bool quartz_is_running();
 float quartz_get_delta_time();
 
@@ -53,7 +54,7 @@ quartz_texture quartz_load_texture(const char* path);
 quartz_texture quartz_make_texture(int width, int height, unsigned char* data);
 void quartz_bind_texture(quartz_texture texture, unsigned int slot);
 
-quartz_viewport quartz_make_viewport(quartz_viewport_info init);
+quartz_viewport quartz_make_viewport();
 
 unsigned int quartz_shader_from_source(unsigned int shader_type, const char* shader_src);
 unsigned int quartz_program_from_shaders(unsigned int vs_id, unsigned int fs_id);

@@ -37,10 +37,18 @@ SOFTWARE.
 #include "../include/input.hpp"
 #include "../include/gfx_info.hpp"
 
+enum quartz_lifetime_mode
+{
+    QUARTZ_LIFETIME_PRE_UPDATE,
+    QUARTZ_LIFETIME_FIRST_UPDATE,
+    QUARTZ_LIFETIME_ESTABLISHED_UPDATE,
+};
+
 struct quartz_base
 {
     static constexpr float DEFAULT_FIXED_DELTA_TIME = 1.0f / 60.0f;
 
+    quartz_lifetime_mode lifetime_mode;
     std::string shader_defines;
 
     float delta_time;
@@ -50,7 +58,7 @@ struct quartz_base
     float fixed_accumulator;
 
     std::vector<quartz_texture_info> textures;
-    std::vector<quartz_viewport_info> viewports;
+    std::vector<quartz_rect> viewports;
     
     quartz_viewport screen_viewport;
 
@@ -64,14 +72,14 @@ quartz_texture_info quartz_texture::get() const
     return base_context.textures[this->id];
 }
 
-void quartz_viewport::set(quartz_viewport_info val)
+void quartz_viewport_set_rect(quartz_viewport vp, quartz_rect rect)
 {
-    base_context.viewports[this->id] = val;
+    base_context.viewports[vp.id] = rect;
 }
 
-quartz_viewport_info quartz_viewport::get() const
+quartz_rect quartz_viewport_get_rect(quartz_viewport vp)
 {
-    return base_context.viewports[this->id];
+    return base_context.viewports[vp.id];
 }
 
 static void APIENTRY quartz_gl_debug_callback(GLenum source, GLenum type, 
@@ -89,6 +97,8 @@ void quartz_start(int width, int height, const char* title)
     glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
     glEnable(GL_DEBUG_OUTPUT);
 
+    base_context.lifetime_mode = QUARTZ_LIFETIME_PRE_UPDATE;
+
     // Setup defines for shaders so that they take into consideration the platforms capabilities
     std::stringstream s;
     s << "\n#define QUARTZ_TEXTURE_UNIT_CAP " << quartz_gfx_get_texture_unit_cap() << "\n";
@@ -99,7 +109,7 @@ void quartz_start(int width, int height, const char* title)
     base_context.is_fixed_update = false;
     base_context.fixed_delta_time = base_context.DEFAULT_FIXED_DELTA_TIME;
     base_context.fixed_accumulator = 0.0f;
-    base_context.screen_viewport = quartz_make_viewport({ 0, 0, base_context.window.size.x, base_context.window.size.y });
+    base_context.screen_viewport = quartz_make_viewport();
 }
 
 bool quartz_update()
@@ -108,6 +118,20 @@ bool quartz_update()
 
     if(running)
     {
+        switch(base_context.lifetime_mode)
+        {
+            case QUARTZ_LIFETIME_PRE_UPDATE:
+                base_context.lifetime_mode = QUARTZ_LIFETIME_FIRST_UPDATE;
+                break;
+            case QUARTZ_LIFETIME_FIRST_UPDATE:
+                base_context.lifetime_mode = QUARTZ_LIFETIME_ESTABLISHED_UPDATE;
+                break;
+            case QUARTZ_LIFETIME_ESTABLISHED_UPDATE:
+                break;
+            default:
+                QUARTZ_ASSERT(false, "Unreachable");
+        }
+
         // End Last Frame
         quartz_window_swap_buffers(&base_context.window);
 
@@ -127,7 +151,7 @@ bool quartz_update()
         if(quartz_was_screen_resized())
         {
             auto screen_size = quartz_get_screen_size();
-            base_context.screen_viewport.set({ 0, 0, screen_size.x, screen_size.y });
+            base_context.screen_viewport.set_rect({ 0, 0, screen_size.x, screen_size.y });
         }
     }
 
@@ -152,6 +176,12 @@ void quartz_set_vsync(bool active)
 void quartz_set_fixed_delta_time(float fixed_delta_time)
 {
     base_context.fixed_delta_time = fixed_delta_time;
+}
+
+bool quartz_is_startup()
+{
+    return base_context.lifetime_mode == QUARTZ_LIFETIME_PRE_UPDATE ||
+           base_context.lifetime_mode == QUARTZ_LIFETIME_FIRST_UPDATE;
 }
 
 bool quartz_is_running()
@@ -244,10 +274,10 @@ void quartz_bind_texture(quartz_texture texture, unsigned int slot)
     glBindTexture(GL_TEXTURE_2D, texture.get_glid());
 }
 
-quartz_viewport quartz_make_viewport(quartz_viewport_info init_val = { 0, 0, 0, 0 })
+quartz_viewport quartz_make_viewport()
 {
     quartz_viewport viewport = { base_context.viewports.size() };
-    base_context.viewports.push_back(init_val);
+    base_context.viewports.push_back({ 0, 0, quartz_get_screen_size().x, quartz_get_screen_size().y });
     return viewport;
 }
 

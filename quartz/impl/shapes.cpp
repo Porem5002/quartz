@@ -24,7 +24,34 @@ SOFTWARE.
 
 #include <utility>
 
-#include "../include/collisions.hpp"
+#include "../include/shapes.hpp"
+
+quartz_rect quartz_rect_calc_boxed(quartz_rect rect, float content_ratio)
+{
+    float rect_ratio = (float)rect.width / rect.height;
+
+    quartz_rect boxed_rect = rect;
+
+    if(rect_ratio >= content_ratio)
+    {
+        boxed_rect.width = boxed_rect.height * content_ratio;
+        boxed_rect.x += (rect.width - boxed_rect.width) / 2;
+    }
+    else
+    {
+        boxed_rect.height = boxed_rect.width * 1.0f / content_ratio;
+        boxed_rect.y += (rect.height - boxed_rect.height) / 2;
+    }
+
+    return boxed_rect;
+}
+
+quartz_ivec2 quartz_rect_clamp_point(quartz_rect rect, quartz_ivec2 point)
+{
+    point.x = quartz_clamp(point.x, rect.x, rect.x + rect.width);
+    point.y = quartz_clamp(point.y, rect.y, rect.y + rect.height);
+    return point;
+}
 
 bool quartz_aabb2_touches_point(quartz_vec2 p, quartz_aabb2 b)
 {

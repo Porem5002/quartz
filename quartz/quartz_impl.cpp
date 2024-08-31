@@ -28,8 +28,7 @@ SOFTWARE.
 #include "impl/render2D.cpp"
 #include "impl/window.cpp"
 #include "impl/input.cpp"
-#include "impl/viewport.cpp"
-#include "impl/collisions.cpp"
+#include "impl/shapes.cpp"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>

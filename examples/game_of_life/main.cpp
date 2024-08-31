@@ -74,7 +74,7 @@ int main()
     quartz_set_fixed_delta_time(TICK_COOLDOWN);
 
     auto screen_vp = quartz_get_screen_viewport();
-    auto world_vp = quartz_make_viewport(quartz_viewport_calc_boxed(screen_vp, BASE_SCREEN_SIDE, BASE_SCREEN_SIDE));
+    auto world_vp = quartz_make_viewport();
 
     quartz_camera2D camera = quartz_init_camera2D(SIDE_CELL_COUNT, SIDE_CELL_COUNT);
     camera.x = SIDE_CELL_COUNT / 2.0 - 0.5;
@@ -86,9 +86,10 @@ int main()
 
     while(quartz_update())
     {
-        if(quartz_was_screen_resized())
+        if(quartz_is_startup() || quartz_was_screen_resized())
         {
-            world_vp.set(quartz_viewport_calc_boxed(screen_vp, BASE_SCREEN_SIDE, BASE_SCREEN_SIDE));
+            quartz_rect r = quartz_rect_calc_boxed(screen_vp.get_rect(), 1.0f);
+            quartz_viewport_set_rect(world_vp, r);
         }
 
         quartz_ivec2 screen_mouse_pos = quartz_get_mouse_pos();
