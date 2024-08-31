@@ -24,7 +24,7 @@ SOFTWARE.
 
 #include <gapil.h>
 
-#include "../include/gfx_info.hpp"
+#include "../include/gfx_info.h"
 
 int quartz_gfx_get_texture_unit_cap()
 {

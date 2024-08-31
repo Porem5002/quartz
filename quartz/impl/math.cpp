@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "../include/math.hpp"
+#include "../include/math.h"
 
 quartz_mat3 quartz_orth2d_projection(float left, float right, float bottom, float top)
 {

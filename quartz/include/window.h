@@ -22,48 +22,32 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef QUARTZ_VIEWPORT_HEADER
-#define QUARTZ_VIEWPORT_HEADER
+#ifndef QUARTZ_WINDOW_HEADER
+#define QUARTZ_WINDOW_HEADER
 
-#include <cstdlib>
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
 
-#include "math.hpp"
-#include "shapes.hpp"
+#include <stdint.h>
 
-struct quartz_viewport
+#include "math.h"
+
+QUARTZ_STRUCT_DEF(quartz_window)
 {
-    size_t id;
-    
-    void set_rect(quartz_rect rect);
-    quartz_rect get_rect() const;
+    bool running;
+    bool resized;
+    quartz_ivec2 size;
+    quartz_ivec2 mouse_pos;
 
-    int get_x() const { return get_rect().x; }
-    int get_y() const { return get_rect().y; }
-    int get_width() const { return get_rect().width; }
-    int get_height() const { return get_rect().height; }
-
-    bool operator ==(quartz_viewport other) const
-    {
-        return id == other.id;
-    }
-
-    bool operator !=(quartz_viewport other) const
-    {
-        return id != other.id;
-    }
+    #if _WIN32
+        HWND win_window;
+        HDC win_dc;
+        HGLRC win_rc;
+    #endif
 };
 
-void quartz_viewport_set_rect(quartz_viewport vp, quartz_rect rect);
-quartz_rect quartz_viewport_get_rect(quartz_viewport vp);
-
-inline void quartz_viewport::set_rect(quartz_rect rect)
-{
-    quartz_viewport_set_rect(*this, rect);
-}
-
-inline quartz_rect quartz_viewport::get_rect() const
-{
-    return quartz_viewport_get_rect(*this);
-}
+QUARTZ_DEF quartz_window quartz_window_create(int width, int height, const char* title);
+QUARTZ_DEF void quartz_window_update(quartz_window* window);
+QUARTZ_DEF void quartz_window_swap_buffers(quartz_window* window);
 
 #endif

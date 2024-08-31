@@ -19,7 +19,7 @@ add_executable(pong ${PONG_SRC})
 target_include_directories(pong PRIVATE "quartz")
 target_link_libraries(pong PRIVATE quartz)
 
-file(GLOB GOL_SRC "examples/game_of_LIFE/*.cpp")
+file(GLOB GOL_SRC "examples/game_of_life/*.cpp")
 add_executable(game_of_life ${GOL_SRC})
 target_include_directories(game_of_life PRIVATE "quartz")
 target_link_libraries(game_of_life PRIVATE quartz)

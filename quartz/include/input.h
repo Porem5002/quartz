@@ -25,9 +25,11 @@ SOFTWARE.
 #ifndef QUARTZ_INPUT_HEADER
 #define QUARTZ_INPUT_HEADER
 
-#include <cstdlib>
+#include <stdlib.h>
 
-enum  quartz_keycode : size_t
+#include "api_compat.h"
+
+QUARTZ_ENUM_DEF(quartz_keycode, size_t)
 {
     QUARTZ_KEY_NONE,
 
@@ -124,11 +126,11 @@ enum  quartz_keycode : size_t
     QUARTZ_KEY_COUNT,
 };
 
-void quartz_update_key_states();
-void quartz_register_key(quartz_keycode key, bool up);
+QUARTZ_DEF void quartz_update_key_states();
+QUARTZ_DEF void quartz_register_key(quartz_keycode key, bool up);
 
-bool quartz_is_key_down(quartz_keycode key);
-bool quartz_is_key_held(quartz_keycode key);
-bool quartz_is_key_up(quartz_keycode key);
+QUARTZ_DEF bool quartz_is_key_down(quartz_keycode key);
+QUARTZ_DEF bool quartz_is_key_held(quartz_keycode key);
+QUARTZ_DEF bool quartz_is_key_up(quartz_keycode key);
 
 #endif

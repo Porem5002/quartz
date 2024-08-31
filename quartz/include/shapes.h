@@ -22,9 +22,37 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef QUARTZ_INFO_HEADER
-#define QUARTZ_INFO_HEADER
+#ifndef QUARTZ_SHAPES_HEADER
+#define QUARTZ_SHAPES_HEADER
 
-int quartz_gfx_get_texture_unit_cap();
+#include "math.h"
+
+QUARTZ_STRUCT_DEF(quartz_rect)
+{
+    int x, y;
+    int width, height;
+};
+
+QUARTZ_STRUCT_DEF(quartz_aabb2)
+{
+    float x, y;
+    float hwidth, hheight;
+};
+
+QUARTZ_STRUCT_DEF(quartz_swept_info)
+{
+    bool collided;
+    float t;
+    quartz_vec2 normal;
+};
+
+QUARTZ_DEF quartz_rect quartz_rect_calc_boxed(quartz_rect rect, float aspect_ratio);
+QUARTZ_DEF quartz_ivec2 quartz_rect_clamp_point(quartz_rect rect, quartz_ivec2 point);
+ 
+QUARTZ_DEF bool quartz_aabb2_touches_point(quartz_vec2 p, quartz_aabb2 b);
+QUARTZ_DEF bool quartz_aabb2_touches_aabb2(quartz_aabb2 a, quartz_aabb2 b);
+
+QUARTZ_DEF quartz_swept_info quartz_aabb2_swept_point(quartz_vec2 p, quartz_vec2 vp, quartz_aabb2 b, quartz_vec2 vb);
+QUARTZ_DEF quartz_swept_info quartz_aabb2_swept_aabb2(quartz_aabb2 a, quartz_vec2 va, quartz_aabb2 b, quartz_vec2 vb);
 
 #endif

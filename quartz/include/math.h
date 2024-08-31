@@ -22,43 +22,52 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef PLAYER_HEADER
-#define PLAYER_HEADER
+#ifndef QUARTZ_MATH_HEADER
+#define QUARTZ_MATH_HEADER
 
-#include <quartz.h>
+#include <stdlib.h>
 
-struct player
+#include "api_compat.h"
+
+QUARTZ_STRUCT_DEF(quartz_ivec2)
 {
-    static constexpr quartz_vec2 SIZE = {15.0f, 50.0f};
-    static constexpr float SPEED = 340.0f;
-
-    quartz_vec2 position;
-    quartz_color color;
-
-    quartz_keycode up_key;
-    quartz_keycode down_key;
-
-    int points = 0;
-    float move_y = 0.0f;
-
-    quartz_aabb2 get_aabb() const
-    {
-        return { position.x, position.y, SIZE.x / 2.0f, SIZE.y / 2.0f };
-    }
-
-    quartz_vec2 get_velocity() const
-    {
-        return { 0, move_y * SPEED * quartz_get_delta_time() };
-    }
-
-    void update();
-
-    void fixed_update();
-
-    void draw()
-    {
-        quartz_render2D_quad(color, position, SIZE);
-    }
+    int x, y;
 };
+
+QUARTZ_STRUCT_DEF(quartz_uvec2)
+{
+    unsigned int x, y;
+};
+
+QUARTZ_STRUCT_DEF(quartz_vec2)
+{
+    float x, y;
+};
+
+QUARTZ_STRUCT_DEF(quartz_mat3)
+{
+    float values [3][3];
+};
+
+QUARTZ_STRUCT_DEF(quartz_mat4)
+{
+    float values [4][4];
+};
+
+#ifdef QUARTZ_CPP
+
+// TODO: Add clamp functions to C API
+template<typename TNumber>
+TNumber quartz_clamp(TNumber v, TNumber min, TNumber max)
+{
+    if(v > max) return max;
+    if(v < min) return min;
+    return v;
+}
+
+#endif
+
+QUARTZ_DEF quartz_mat3 quartz_orth2d_projection(float left, float right, float bottom, float top);
+QUARTZ_DEF quartz_mat4 quartz_orth3d_projection(float left, float right, float bottom, float top, float near_, float far_);
 
 #endif

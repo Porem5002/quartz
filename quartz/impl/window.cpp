@@ -24,9 +24,9 @@ SOFTWARE.
 
 #include <gapil.h>
 
-#include "../include/common.hpp"
-#include "../include/window.hpp"
-#include "../include/input.hpp"
+#include "../include/common.h"
+#include "../include/window.h"
+#include "../include/input.h"
 
 #ifdef _WIN32
 

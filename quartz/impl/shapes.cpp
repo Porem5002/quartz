@@ -22,9 +22,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include <utility>
+#include <cstdlib>
 
-#include "../include/shapes.hpp"
+#include "../include/shapes.h"
 
 quartz_rect quartz_rect_calc_boxed(quartz_rect rect, float content_ratio)
 {

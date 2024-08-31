@@ -27,10 +27,10 @@ SOFTWARE.
 
 #include <gapil.h>
 
-#include "../include/render2D.hpp"
-#include "../include/common.hpp"
-#include "../include/base.hpp"
-#include "../include/gfx_info.hpp"
+#include "../include/render2D.h"
+#include "../include/common.h"
+#include "../include/base.h"
+#include "../include/gfx_info.h"
 
 struct quartz_render2D
 {
@@ -229,39 +229,6 @@ void quartz_render2D_set_camera(const quartz_camera2D* camera)
     render2D_context.projection = quartz_camera2D_get_projection(camera);
 }
 
-static unsigned int quartz_render2D_push_new_texture(quartz_texture texture)
-{
-    unsigned int slot;
-    bool found = false;
-
-    for (size_t i = 0; i < render2D_context.texture_slot_index; i++)
-    {
-        if(render2D_context.texture_slots[i] == texture)
-        {
-            slot = i;
-            found = true;
-            break;
-        }
-    }
-
-    if(!found)
-    {
-        QUARTZ_ASSERT(render2D_context.texture_slot_index < render2D_context.texture_slot_cap, "Texture slot index exceeds capacity");
-
-        if(render2D_context.texture_slot_index == render2D_context.texture_slot_cap)
-            quartz_render2D_flush();
-
-        slot = render2D_context.texture_slot_index;
-
-        quartz_bind_texture(texture, slot);
-        
-        render2D_context.texture_slots[render2D_context.texture_slot_index] = texture;
-        render2D_context.texture_slot_index++;
-    }
-
-    return slot;
-}
-
 void quartz_render2D_sprite_ex(quartz_primitive2D primitive, quartz_sprite sprite, quartz_vec2 pos, quartz_vec2 scale, float rotation, quartz_color tint)
 {
     unsigned int slot = quartz_render2D_push_new_texture(sprite.atlas);
@@ -340,4 +307,37 @@ void quartz_render2D_flush()
     glDrawElementsInstanced(GL_TRIANGLE_STRIP, 6, GL_UNSIGNED_INT, 0, render2D_context.instance_count);
 
     render2D_context.instance_count = 0;
+}
+
+static unsigned int quartz_render2D_push_new_texture(quartz_texture texture)
+{
+    unsigned int slot;
+    bool found = false;
+
+    for (size_t i = 0; i < render2D_context.texture_slot_index; i++)
+    {
+        if(render2D_context.texture_slots[i] == texture)
+        {
+            slot = i;
+            found = true;
+            break;
+        }
+    }
+
+    if(!found)
+    {
+        QUARTZ_ASSERT(render2D_context.texture_slot_index < render2D_context.texture_slot_cap, "Texture slot index exceeds capacity");
+
+        if(render2D_context.texture_slot_index == render2D_context.texture_slot_cap)
+            quartz_render2D_flush();
+
+        slot = render2D_context.texture_slot_index;
+
+        quartz_bind_texture(texture, slot);
+        
+        render2D_context.texture_slots[render2D_context.texture_slot_index] = texture;
+        render2D_context.texture_slot_index++;
+    }
+
+    return slot;
 }

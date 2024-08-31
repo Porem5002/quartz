@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include <quartz.hpp>
+#include <quartz.h>
 
 #include "include/player.hpp"
 #include "include/game.hpp"

@@ -25,7 +25,7 @@ SOFTWARE.
 #ifndef PONG_GAME_HEADER
 #define PONG_GAME_HEADER
 
-#include <quartz.hpp>
+#include <quartz.h>
 
 #include "player.hpp"
 #include "ball.hpp"

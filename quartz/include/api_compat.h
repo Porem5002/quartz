@@ -22,12 +22,33 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "include/common.hpp"
-#include "include/base.hpp"
-#include "include/math.hpp"
-#include "include/gfx_info.hpp"
-#include "include/render2D.hpp"
-#include "include/window.hpp"
-#include "include/input.hpp"
-#include "include/viewport.hpp"
-#include "include/shapes.hpp"
+#ifndef QUARTZ_API_COMPAT_HEADER
+#define QUARTZ_API_COMPAT_HEADER
+
+#ifdef __cplusplus
+#define QUARTZ_CPP
+#define QUARTZ_DEF extern "C"
+#define QUARTZ_CPP_ONLY(...) __VA_ARGS__
+
+#define QUARTZ_ENUM_DEF(NAME, TYPE) enum NAME : TYPE
+
+#define QUARTZ_STRUCT_LIT(TYPE, ...) (TYPE __VA_ARGS__)
+#define QUARTZ_STRUCT_LIT_ZERO(TYPE) (TYPE {})
+
+#else
+#define QUARTZ_C
+#define QUARTZ_DEF extern
+#define QUARTZ_CPP_ONLY(...)
+
+#include <stdbool.h>
+
+#define QUARTZ_ENUM_DEF(NAME, TYPE) typedef TYPE NAME; enum
+
+#define QUARTZ_STRUCT_LIT(TYPE, ...) ((TYPE) __VA_ARGS__) 
+#define QUARTZ_STRUCT_LIT_ZERO(TYPE) ((TYPE) {0}) 
+
+#endif
+
+#define QUARTZ_STRUCT_DEF(NAME) typedef struct NAME NAME; struct NAME
+
+#endif

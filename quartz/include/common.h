@@ -25,21 +25,22 @@ SOFTWARE.
 #ifndef QUARTZ_INTERNALS_HEADER
 #define QUARTZ_INTERNALS_HEADER
 
-#include <cstdio>
-#include <cstdint>
+#include <stdio.h>
+#include <stdint.h>
 
-#include "math.hpp"
+#include "math.h"
 
-struct quartz_texture_info
+QUARTZ_STRUCT_DEF(quartz_texture_info)
 {
     unsigned int glid;
     int width, height, channels;
 };
 
-struct quartz_texture
+QUARTZ_STRUCT_DEF(quartz_texture)
 {
     size_t id;
 
+#ifdef QUARTZ_CPP
     quartz_texture_info get() const;
     unsigned int get_glid() const { return get().glid; }
     int get_width() const { return get().width; }
@@ -54,21 +55,25 @@ struct quartz_texture
     {
         return id != other.id;
     }
+#endif
+
 };
 
-using quartz_shader = unsigned int;
+typedef unsigned int quartz_shader;
 
-struct quartz_sprite
+QUARTZ_STRUCT_DEF(quartz_sprite)
 {
     quartz_texture atlas;
     quartz_uvec2 offset;
     quartz_uvec2 size;
 };
 
-struct quartz_color
+QUARTZ_STRUCT_DEF(quartz_color)
 {
     float r, g, b, a;
 };
+
+#ifdef QUARTZ_CPP
 
 constexpr quartz_color QUARTZ_TRANSPARENT = { 0.0f, 0.0f, 0.0f, 0.0f };
 constexpr quartz_color QUARTZ_BLACK = { 0.0f, 0.0f, 0.0f, 1.0f };
@@ -77,6 +82,18 @@ constexpr quartz_color QUARTZ_WHITE = { 1.0f, 1.0f, 1.0f, 1.0f };
 constexpr quartz_color QUARTZ_RED = { 1.0f, 0.0f, 0.0f, 1.0f };
 constexpr quartz_color QUARTZ_GREEN = { 0.0f, 1.0f, 0.0f, 1.0f };
 constexpr quartz_color QUARTZ_BLUE = { 0.0f, 0.0f, 1.0f, 1.0f };
+
+#else
+
+#define QUARTZ_TRANSPARENT ((quartz_color) { 0.0f, 0.0f, 0.0f, 0.0f })
+#define QUARTZ_BLACK ((quartz_color) { 0.0f, 0.0f, 0.0f, 1.0f })
+#define QUARTZ_WHITE ((quartz_color) { 1.0f, 1.0f, 1.0f, 1.0f })
+
+#define QUARTZ_RED ((quartz_color) { 1.0f, 0.0f, 0.0f, 1.0f })
+#define QUARTZ_GREEN ((quartz_color) { 0.0f, 1.0f, 0.0f, 1.0f })
+#define QUARTZ_BLUE ((quartz_color) { 0.0f, 0.0f, 1.0f, 1.0f })
+
+#endif
 
 #define QUARTZ_DEBUG_BREAK() __debugbreak()
 

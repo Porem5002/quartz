@@ -32,10 +32,10 @@ SOFTWARE.
 #include <stb_image.h>
 #include <gapil.h>
 
-#include "../include/base.hpp"
-#include "../include/window.hpp"
-#include "../include/input.hpp"
-#include "../include/gfx_info.hpp"
+#include "../include/base.h"
+#include "../include/window.h"
+#include "../include/input.h"
+#include "../include/gfx_info.h"
 
 enum quartz_lifetime_mode
 {
@@ -67,6 +67,11 @@ struct quartz_base
 
 static quartz_base base_context = {};
 
+static void APIENTRY quartz_gl_debug_callback(GLenum source, GLenum type, 
+                                GLuint id, GLenum severity,
+                                GLsizei length, const GLchar *message,
+                                const void *userParam);
+
 quartz_texture_info quartz_texture::get() const
 {
     return base_context.textures[this->id];
@@ -81,11 +86,6 @@ quartz_rect quartz_viewport_get_rect(quartz_viewport vp)
 {
     return base_context.viewports[vp.id];
 }
-
-static void APIENTRY quartz_gl_debug_callback(GLenum source, GLenum type, 
-                                GLuint id, GLenum severity,
-                                GLsizei length, const GLchar *message,
-                                const void *userParam);
 
 void quartz_start(int width, int height, const char* title)
 {
