@@ -182,5 +182,7 @@ int main()
         quartz_render2D_flush();
     }
 
+    quartz_finish();
+
     return 0;
 }

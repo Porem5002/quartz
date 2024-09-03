@@ -112,6 +112,11 @@ void quartz_start(int width, int height, const char* title)
     base_context.screen_viewport = quartz_make_viewport();
 }
 
+void quartz_finish()
+{
+    // In the future, cleanup will be done here if required
+}
+
 bool quartz_update()
 {
     bool running = quartz_is_running();

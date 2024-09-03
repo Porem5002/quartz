@@ -32,6 +32,8 @@ SOFTWARE.
 #include "viewport.h"
 
 QUARTZ_DEF void quartz_start(int width, int height, const char* title);
+QUARTZ_DEF void quartz_finish();
+
 QUARTZ_DEF bool quartz_update();
 QUARTZ_DEF bool quartz_fixed_update();
 
