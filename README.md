@@ -1,6 +1,6 @@
 # Quartz
 
-A library for making graphical applications
+A library for making graphical applications and games
 
 **BEWARE:**
 Quartz is still in its infancy meaning that API breaking changes are constantly being made, there is pretty much no documentation and cross platform support is still limited.
