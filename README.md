@@ -5,8 +5,8 @@ A library for making graphical applications and games
 **BEWARE:**
 Quartz is still in its infancy meaning that API breaking changes are constantly being made, there is pretty much no documentation and cross platform support is still limited.
 
-<!-- ## Game of Life in Quartz
-Example will be here -->
+## Game of Life in Quartz
+https://github.com/user-attachments/assets/441ea195-ef05-487b-b5bd-c6e622b0eb93
 
 ## Code Example
 ```C
