@@ -27,7 +27,7 @@ SOFTWARE.
 
 #ifdef __cplusplus
 #define QUARTZ_CPP
-#define QUARTZ_DEF extern "C"
+#define QUARTZ_DEF_LINKAGE extern "C"
 #define QUARTZ_CPP_ONLY(...) __VA_ARGS__
 
 #define QUARTZ_ENUM_DEF(NAME, TYPE) enum NAME : TYPE
@@ -37,7 +37,7 @@ SOFTWARE.
 
 #else
 #define QUARTZ_C
-#define QUARTZ_DEF extern
+#define QUARTZ_DEF_LINKAGE extern
 #define QUARTZ_CPP_ONLY(...)
 
 #include <stdbool.h>
@@ -47,6 +47,18 @@ SOFTWARE.
 #define QUARTZ_STRUCT_LIT(TYPE, ...) ((TYPE) __VA_ARGS__) 
 #define QUARTZ_STRUCT_LIT_ZERO(TYPE) ((TYPE) {0}) 
 
+#endif
+
+#ifdef _WIN32
+    #ifdef QUARTZ_DYNAMIC_LIB_EXPORT
+        #define QUARTZ_DEF QUARTZ_DEF_LINKAGE __declspec(dllexport)
+    #elif defined(QUARTZ_DYNAMIC_LIB_IMPORT)
+        #define QUARTZ_DEF QUARTZ_DEF_LINKAGE __declspec(dllimport)
+    #else
+        #define QUARTZ_DEF QUARTZ_DEF_LINKAGE
+    #endif
+#else
+    #error "QUARTZ_DEF not defined for this platform"
 #endif
 
 #define QUARTZ_STRUCT_DEF(NAME) typedef struct NAME NAME; struct NAME
