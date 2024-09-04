@@ -32,12 +32,22 @@ The only platform supported right now is Windows.
 
 Quartz uses OpenGL 4.3 internally so it can only run on systems with drivers that support it.
 
+## Using Quartz
+You can use Quartz either as a static library or as a dynamic one, both versions are provided in the [Precompiled Binaries](https://github.com/Porem5002/quartz/releases/)
+ 
+To use the dynamic version (**quartzdyn**) make sure to define the macro **QUARTZ_DYNAMIC_LIB_IMPORT** when compiling your project (on Windows you also need to link with **quartzdyn.lib**)
+
+To use the static version (**quartz**) you need to link it when compiling your project. Depending on your platform you will also need to link with other native libraries:
+- Windows - **user32.lib**, **opengl32.lib** and **gdi32.lib**
+
+After setting up the library for using in your project, you just need to include **quartz.h** to get access to the API.
+
 ## Building from source
 To compile Quartz you will need a C++ compiler. At the moment of writing, any of the popular C++ compilers (MSVC, Clang and GCC) should work.
 
 The main way of compiling the library is using the [CMake](https://cmake.org) build system.
 
-To build a debug build you just need to follow these steps:
+To build the library you just need to follow these steps:
 ```sh
 mkdir build
 cd build
@@ -45,12 +55,21 @@ cmake ..
 cmake --build .
 ```
 
-To build a release build replace the last command with this one:
+You can also specify some options to control what will be compiled and how it will be compiled:
+- **DYNAMIC** - if **ON** compiles as a dynamic library otherwise as a static library
+- **EXAMPLES** - if **ON** the examples will be compiled
+
+These options can be specified on the third command of the build steps, for example this will generate a dynamic library without compiling the examples.
 ```sh
-cmake --build . --config=release
+cmake -DDYNAMIC=ON -DEXAMPLES=OFF ..
 ```
 
-If everything was setup correctly and executed successfully, the compiled library will be inside the **build** directory along with the executables of the examples from the **examples** directory.
+Finally to explicitly select if you want a debug build or a release build you use the **--config** flag of the last build step, like this:
+```sh
+cmake --build . --config=debug
+# OR
+cmake --build . --config=release
+```
 
 # License
 Quartz is licensed under the [MIT License](LICENSE)
