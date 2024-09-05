@@ -60,7 +60,6 @@ struct quartz_render2D
     instance_data instances [INSTANCE_CAP];
 
     size_t texture_slot_cap;
-    size_t texture_slot_index;
     std::vector<quartz_texture> texture_slots;
 
     quartz_sprite quad_sprite;
@@ -121,8 +120,7 @@ void quartz_render2D_init()
 
     // Setup texture slots
     render2D_context.texture_slot_cap = quartz_gfx_get_texture_unit_cap();
-    render2D_context.texture_slot_index = 0;
-    render2D_context.texture_slots.resize(render2D_context.texture_slot_cap);
+    render2D_context.texture_slots.reserve(render2D_context.texture_slot_cap);
 
     // Setup shader samplers for texture slots
     std::vector<int> samplers;
@@ -308,7 +306,7 @@ void quartz_render2D_flush()
 
     // Prepare for next render
     render2D_context.instance_count = 0;
-    render2D_context.texture_slot_index = 0;
+    render2D_context.texture_slots.clear();
 }
 
 static unsigned int quartz_render2D_push_new_texture(quartz_texture texture)
@@ -316,7 +314,7 @@ static unsigned int quartz_render2D_push_new_texture(quartz_texture texture)
     unsigned int slot;
     bool found = false;
 
-    for (size_t i = 0; i < render2D_context.texture_slot_index; i++)
+    for (size_t i = 0; i < render2D_context.texture_slots.size(); i++)
     {
         if(render2D_context.texture_slots[i] == texture)
         {
@@ -328,17 +326,14 @@ static unsigned int quartz_render2D_push_new_texture(quartz_texture texture)
 
     if(!found)
     {
-        QUARTZ_ASSERT(render2D_context.texture_slot_index <= render2D_context.texture_slot_cap, "Texture slot index exceeds capacity");
+        QUARTZ_ASSERT(render2D_context.texture_slots.size() <= render2D_context.texture_slot_cap, "Texture slot index exceeds capacity");
 
-        if(render2D_context.texture_slot_index == render2D_context.texture_slot_cap)
+        if(render2D_context.texture_slots.size() == render2D_context.texture_slot_cap)
             quartz_render2D_flush();
 
-        slot = render2D_context.texture_slot_index;
-
+        slot = (unsigned int)render2D_context.texture_slots.size();
         quartz_bind_texture(texture, slot);
-        
-        render2D_context.texture_slots[render2D_context.texture_slot_index] = texture;
-        render2D_context.texture_slot_index++;
+        render2D_context.texture_slots.push_back(texture);
     }
 
     return slot;
