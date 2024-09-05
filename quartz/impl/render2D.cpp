@@ -306,7 +306,9 @@ void quartz_render2D_flush()
     glBindVertexArray(render2D_context.va_id);
     glDrawElementsInstanced(GL_TRIANGLE_STRIP, 6, GL_UNSIGNED_INT, 0, render2D_context.instance_count);
 
+    // Prepare for next render
     render2D_context.instance_count = 0;
+    render2D_context.texture_slot_index = 0;
 }
 
 static unsigned int quartz_render2D_push_new_texture(quartz_texture texture)
@@ -326,7 +328,7 @@ static unsigned int quartz_render2D_push_new_texture(quartz_texture texture)
 
     if(!found)
     {
-        QUARTZ_ASSERT(render2D_context.texture_slot_index < render2D_context.texture_slot_cap, "Texture slot index exceeds capacity");
+        QUARTZ_ASSERT(render2D_context.texture_slot_index <= render2D_context.texture_slot_cap, "Texture slot index exceeds capacity");
 
         if(render2D_context.texture_slot_index == render2D_context.texture_slot_cap)
             quartz_render2D_flush();
