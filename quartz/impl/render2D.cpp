@@ -137,10 +137,10 @@ void quartz_render2D_init()
     
     #if 1 // Setup OpenGL Attributes
     float vertex_data [] = {
-        -0.5, -0.5, 0, 1,
-        0.5, -0.5, 1, 1,
-        0.5, 0.5, 1, 0,
-        -0.5, 0.5, 0, 0
+        -0.5, -0.5, 0, 0, // Bottom Left
+        0.5, -0.5, 1, 0,  // Bottom Right
+        0.5, 0.5, 1, 1,   // Top Right
+        -0.5, 0.5, 0, 1   // Top Left
     };
 
     unsigned int index_data [] = {

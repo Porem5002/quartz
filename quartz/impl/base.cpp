@@ -235,8 +235,6 @@ void quartz_use_shader(quartz_shader shader)
 
 quartz_texture quartz_load_texture(const char* path)
 {
-    stbi_set_flip_vertically_on_load(1);
-
     int w, h, channels;
     auto data = stbi_load(path, &w, &h, &channels, 4);
     QUARTZ_ASSERT(data != nullptr, "Could not load texture from the path");
