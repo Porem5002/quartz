@@ -28,7 +28,6 @@ void main()
 
     f_textureIndex = v_textureIndex;
     f_texturePos = v_uvOffset + v_uvMult * v_uvSize;
-    f_texturePos.y = 1 - f_texturePos.y;
 
     mat3 rot_mat = mat3(cos(v_rotation), -sin(v_rotation), 0.0,
                         sin(v_rotation), cos(v_rotation), 0.0,
