@@ -30,6 +30,7 @@ SOFTWARE.
 
 #include "common.h"
 #include "viewport.h"
+#include "resources.h"
 
 QUARTZ_ENUM_DEF(quartz_primitive2D, uint16_t)
 {

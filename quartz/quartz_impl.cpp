@@ -24,6 +24,7 @@ SOFTWARE.
 
 #include "impl/base.cpp"
 #include "impl/math.cpp"
+#include "impl/resources.cpp"
 #include "impl/gfx_info.cpp"
 #include "impl/render2D.cpp"
 #include "impl/window.cpp"

@@ -26,47 +26,8 @@ SOFTWARE.
 #define QUARTZ_INTERNALS_HEADER
 
 #include <stdio.h>
-#include <stdint.h>
 
 #include "math.h"
-
-QUARTZ_STRUCT_DEF(quartz_texture_info)
-{
-    unsigned int glid;
-    int width, height, channels;
-};
-
-QUARTZ_STRUCT_DEF(quartz_texture)
-{
-    size_t id;
-
-#ifdef QUARTZ_CPP
-    quartz_texture_info get() const;
-    unsigned int get_glid() const { return get().glid; }
-    int get_width() const { return get().width; }
-    int get_height() const { return get().height; }
-
-    bool operator ==(quartz_texture other) const
-    {
-        return id == other.id;
-    }
-
-    bool operator !=(quartz_texture other) const
-    {
-        return id != other.id;
-    }
-#endif
-
-};
-
-typedef unsigned int quartz_shader;
-
-QUARTZ_STRUCT_DEF(quartz_sprite)
-{
-    quartz_texture atlas;
-    quartz_uvec2 offset;
-    quartz_uvec2 size;
-};
 
 QUARTZ_STRUCT_DEF(quartz_color)
 {

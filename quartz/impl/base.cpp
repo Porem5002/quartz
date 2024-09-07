@@ -27,7 +27,6 @@ SOFTWARE.
 
 #include <vector>
 #include <chrono>
-#include <malloc.h>
 
 #include <stb_image.h>
 #include <gapil.h>
@@ -57,7 +56,6 @@ struct quartz_base
     float fixed_delta_time;
     float fixed_accumulator;
 
-    std::vector<quartz_texture_info> textures;
     std::vector<quartz_rect> viewports;
     
     quartz_viewport screen_viewport;
@@ -72,11 +70,6 @@ static void APIENTRY quartz_gl_debug_callback(GLenum source, GLenum type,
                                 GLsizei length, const GLchar *message,
                                 const void *userParam);
 
-quartz_texture_info quartz_texture::get() const
-{
-    return base_context.textures[this->id];
-}
-
 void quartz_viewport_set_rect(quartz_viewport vp, quartz_rect rect)
 {
     base_context.viewports[vp.id] = rect;
@@ -86,6 +79,8 @@ quartz_rect quartz_viewport_get_rect(quartz_viewport vp)
 {
     return base_context.viewports[vp.id];
 }
+
+void quartz_resources_init();
 
 void quartz_start(int width, int height, const char* title)
 {
@@ -98,11 +93,7 @@ void quartz_start(int width, int height, const char* title)
     glEnable(GL_DEBUG_OUTPUT);
 
     base_context.lifetime_mode = QUARTZ_LIFETIME_PRE_UPDATE;
-
-    // Setup defines for shaders so that they take into consideration the platforms capabilities
-    std::stringstream s;
-    s << "\n#define QUARTZ_TEXTURE_UNIT_CAP " << quartz_gfx_get_texture_unit_cap() << "\n";
-    base_context.shader_defines = s.str();
+    quartz_resources_init();
 
     // Default Config
     quartz_set_vsync(true);
@@ -219,127 +210,11 @@ quartz_ivec2 quartz_get_mouse_pos()
     return base_context.window.mouse_pos;
 }
 
-quartz_shader quartz_make_shader(const char* vs_code, const char* fs_code)
-{
-    GLuint vs_id = quartz_shader_from_source(GL_VERTEX_SHADER, vs_code);
-    GLuint fs_id = quartz_shader_from_source(GL_FRAGMENT_SHADER, fs_code);
-    GLuint prog_id = quartz_program_from_shaders(vs_id, fs_id);
-    glValidateProgram(prog_id);
-    return prog_id;
-}
-
-void quartz_use_shader(quartz_shader shader)
-{
-    glUseProgram(shader);
-}
-
-quartz_texture quartz_load_texture(const char* path)
-{
-    int w, h, channels;
-    auto data = stbi_load(path, &w, &h, &channels, 4);
-    QUARTZ_ASSERT(data != nullptr, "Could not load texture from the path");
-    
-    quartz_texture texture = quartz_make_texture(w, h, data);
-    stbi_image_free(data);
-
-    return texture;
-}
-
-quartz_texture quartz_make_texture(int width, int height, unsigned char* data)
-{
-    GLuint id;
-    glGenTextures(1, &id);
-    glBindTexture(GL_TEXTURE_2D, id);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    quartz_texture_info texture_info;
-    texture_info.glid = id;
-    texture_info.width = width;
-    texture_info.height = height;
-    texture_info.channels = 4;
-
-    quartz_texture texture = { base_context.textures.size() };
-    base_context.textures.push_back(texture_info);
-    return texture;
-}
-
-void quartz_bind_texture(quartz_texture texture, unsigned int slot)
-{
-    glActiveTexture(GL_TEXTURE0 + slot);
-    glBindTexture(GL_TEXTURE_2D, texture.get_glid());
-}
-
 quartz_viewport quartz_make_viewport()
 {
     quartz_viewport viewport = { base_context.viewports.size() };
     base_context.viewports.push_back({ 0, 0, quartz_get_screen_size().x, quartz_get_screen_size().y });
     return viewport;
-}
-
-unsigned int quartz_shader_from_source(unsigned int shader_type, const char* shader_src)
-{
-    const char* usage_symbol = "QUARTZ_USE_DEFINES";
-    std::string src_with_defines = shader_src;
-
-    // Inserts quartz specific macros into shader if QUARTZ_USE_DEFINES exists, replacing it with the defines
-    size_t replacement_index = src_with_defines.find(usage_symbol);
-    if(replacement_index != std::string::npos)
-        src_with_defines.replace(replacement_index, strlen(usage_symbol), base_context.shader_defines);
-
-    const char* final_shader_src = src_with_defines.c_str();
-
-    GLuint id = glCreateShader(shader_type);
-    glShaderSource(id, 1, &final_shader_src, nullptr);
-    quartz_compile_shader(id);
-    return id;
-}
-
-unsigned int quartz_program_from_shaders(unsigned int vs_id, unsigned int fs_id)
-{
-    GLuint id = glCreateProgram();
-    glAttachShader(id, vs_id);
-    glAttachShader(id, fs_id);
-    glLinkProgram(id);
-
-    GLint linkStatus;
-    glGetProgramiv(id, GL_LINK_STATUS, &linkStatus);
-    
-    //TODO: Improve error logging
-    if(linkStatus == GL_FALSE)
-    {
-        GLint log_length;
-        glGetProgramiv(id, GL_INFO_LOG_LENGTH, &log_length);
-
-        char* log_msg = (char*)malloc(log_length * sizeof(char));
-        glGetProgramInfoLog(id, log_length, &log_length, log_msg);
-
-        QUARTZ_ASSERT(false, log_msg);
-    }
-
-    return id;
-}
-
-void quartz_compile_shader(unsigned int shader_id)
-{
-    glCompileShader(shader_id);
-
-    int success;
-    char shaderLog[2048];
-    glGetShaderiv(shader_id, GL_COMPILE_STATUS, &success);
-
-    if(!success)
-    {
-        glGetShaderInfoLog(shader_id, 2048, 0, shaderLog);
-        QUARTZ_ASSERT(false, shaderLog);
-    }
 }
 
 void quartz_clear(quartz_color color)

@@ -113,7 +113,7 @@ void quartz_render2D_init()
     ;
 
     render2D_context.shader = quartz_make_shader(vertex_shader, frag_shader);
-    render2D_context.u_projection = glGetUniformLocation(render2D_context.shader, "u_projection");
+    render2D_context.u_projection = glGetUniformLocation(render2D_context.shader.get_program_id(), "u_projection");
     #endif
 
     render2D_context.instance_count = 0;
@@ -129,7 +129,7 @@ void quartz_render2D_init()
     for(size_t i = 0; i < render2D_context.texture_slot_cap; i++)
         samplers[i] = (int)i;
     
-    GLuint u_textures = glGetUniformLocation(render2D_context.shader, "u_textures");
+    GLuint u_textures = glGetUniformLocation(render2D_context.shader.get_program_id(), "u_textures");
     quartz_use_shader(render2D_context.shader);
     glUniform1iv(u_textures, render2D_context.texture_slot_cap, samplers.data());
     

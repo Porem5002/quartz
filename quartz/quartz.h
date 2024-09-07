@@ -25,6 +25,7 @@ SOFTWARE.
 #include "include/common.h"
 #include "include/base.h"
 #include "include/math.h"
+#include "include/resources.h"
 #include "include/gfx_info.h"
 #include "include/render2D.h"
 #include "include/window.h"
