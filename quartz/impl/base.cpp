@@ -81,6 +81,7 @@ quartz_rect quartz_viewport_get_rect(quartz_viewport vp)
 }
 
 void quartz_resources_init();
+void quartz_resources_finish();
 
 void quartz_start(int width, int height, const char* title)
 {
@@ -105,7 +106,7 @@ void quartz_start(int width, int height, const char* title)
 
 void quartz_finish()
 {
-    // In the future, cleanup will be done here if required
+    quartz_resources_finish();
 }
 
 bool quartz_update()

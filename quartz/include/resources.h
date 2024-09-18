@@ -58,6 +58,32 @@ QUARTZ_STRUCT_DEF(quartz_texture)
 
 };
 
+QUARTZ_STRUCT_DEF(quartz_sprite)
+{
+    quartz_texture atlas;
+    quartz_uvec2 offset;
+    quartz_uvec2 size;
+};
+
+#ifdef QUARTZ_CPP
+constexpr unsigned int QUARTZ_BASE_FONT_SIZE = 128;
+#else
+#define QUARTZ_BASE_FONT_SIZE ((unsigned int)128)
+#endif
+
+QUARTZ_STRUCT_DEF(quartz_font)
+{
+    size_t id;
+};
+
+QUARTZ_STRUCT_DEF(quartz_glyph_info)
+{
+    unsigned long codepoint;
+    float advance_x;
+    float bearing_y;
+    quartz_sprite sprite;
+};
+
 QUARTZ_STRUCT_DEF(quartz_shader_info)
 {
     unsigned int program_id;
@@ -77,14 +103,8 @@ QUARTZ_STRUCT_DEF(quartz_shader)
 #endif
 };
 
-QUARTZ_STRUCT_DEF(quartz_sprite)
-{
-    quartz_texture atlas;
-    quartz_uvec2 offset;
-    quartz_uvec2 size;
-};
-
-QUARTZ_DEF quartz_shader quartz_load_shader(const char* vs_path, const char* fs_path);
+//TODO: Implement quartz_load_shader
+//QUARTZ_DEF quartz_shader quartz_load_shader(const char* vs_path, const char* fs_path);
 QUARTZ_DEF quartz_shader quartz_make_shader(const char* vs_code, const char* fs_code);
 QUARTZ_DEF void quartz_use_shader(quartz_shader shader);
 QUARTZ_DEF quartz_shader_info quartz_shader_get_info(quartz_shader shader);
@@ -93,5 +113,11 @@ QUARTZ_DEF quartz_texture quartz_load_texture(const char* path);
 QUARTZ_DEF quartz_texture quartz_make_texture(int width, int height, unsigned char* data);
 QUARTZ_DEF void quartz_bind_texture(quartz_texture texture, unsigned int slot);
 QUARTZ_DEF quartz_texture_info quartz_texture_get_info(quartz_texture texture);
+
+QUARTZ_DEF quartz_font quartz_load_font(const char* font_path);
+QUARTZ_DEF float quartz_font_get_ascender(quartz_font font);
+QUARTZ_DEF float quartz_font_get_descender(quartz_font font);
+QUARTZ_DEF quartz_vec2 quartz_font_get_text_size(quartz_font font, float font_size, const char* text);
+QUARTZ_DEF quartz_glyph_info quartz_font_get_glyph_info(quartz_font font, unsigned long codepoint);
 
 #endif

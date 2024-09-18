@@ -21,13 +21,16 @@ else()
     add_library(${quartz} STATIC "quartz/quartz_impl.cpp")
 endif()
 
-target_include_directories(${quartz} PRIVATE "third_party/" "third_party/GL/")
+target_include_directories(${quartz} PRIVATE "third_party/" "third_party/GL/" "third_party/freetype/")
 target_link_libraries(${quartz} PRIVATE user32 opengl32 gdi32)
+
+target_link_directories(${quartz} PUBLIC "third_party/freetype/lib")
+target_link_libraries(${quartz} PUBLIC "freetype.lib")
 
 # Examples
 if(EXAMPLES)
     function(make_example EXAMPLE_NAME)
-        file(GLOB EXAMPLE_SRC "examples/${EXAMPLE_NAME}/*.cpp")
+        file(GLOB EXAMPLE_SRC "examples/${EXAMPLE_NAME}/*.cpp" "examples/${EXAMPLE_NAME}/*.c")
         add_executable(${EXAMPLE_NAME} ${EXAMPLE_SRC})
         target_include_directories(${EXAMPLE_NAME} PRIVATE "quartz")
         target_link_libraries(${EXAMPLE_NAME} PRIVATE ${quartz})
@@ -39,4 +42,5 @@ if(EXAMPLES)
 
     make_example(pong)
     make_example(game_of_life)
+    make_example(test)
 endif()

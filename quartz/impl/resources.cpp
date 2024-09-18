@@ -29,15 +29,27 @@ SOFTWARE.
 #include <gapil.h>
 #include <stb_image.h>
 
+#include <ft2build.h>
+#include FT_FREETYPE_H
+
 #include "..\include\resources.h"
 #include "..\include\common.h"
 #include "..\include\gfx_info.h"
 
+struct quartz_font_info
+{
+    FT_Face font;
+    std::vector<quartz_glyph_info> cached_glyphs;
+};
+
 struct quartz_resources
 {
+    FT_Library ft_library;
+
     std::string shader_defines;
 
     std::vector<quartz_texture_info> textures;
+    std::vector<quartz_font_info> fonts;
     std::vector<quartz_shader_info> shaders;
 };
 
@@ -48,16 +60,25 @@ static unsigned int quartz_shader_from_partial_shaders(unsigned int vs_id, unsig
 
 void quartz_resources_init()
 {
+    if(FT_Init_FreeType(&resources_context.ft_library) != FT_Err_Ok)
+        QUARTZ_ASSERT(false, "Could not initialize FreeType!");
+
     // Setup defines for shaders so that they take into consideration the platforms capabilities
     std::stringstream s;
     s << "\n#define QUARTZ_TEXTURE_UNIT_CAP " << quartz_gfx_get_texture_unit_cap() << "\n";
     resources_context.shader_defines = s.str();
 }
 
-quartz_shader quartz_load_shader(const char* vs_path, const char* fs_path)
+void quartz_resources_finish()
+{
+    FT_Done_FreeType(resources_context.ft_library);
+}
+
+//TODO: Implement quartz_load_shader
+/*quartz_shader quartz_load_shader(const char* vs_path, const char* fs_path)
 {
     return {};
-}
+}*/
 
 quartz_shader quartz_make_shader(const char* vs_code, const char* fs_code)
 {
@@ -143,6 +164,113 @@ quartz_texture_info quartz_texture_get_info(quartz_texture texture)
 quartz_texture_info quartz_texture::get() const
 {
     return quartz_texture_get_info(*this);
+}
+
+quartz_font quartz_load_font(const char* font_path)
+{
+    FT_Face font;
+    if(FT_New_Face(resources_context.ft_library, font_path, 0, &font) != FT_Err_Ok)
+        QUARTZ_ASSERT(false, "Could not initialize font!");
+
+    quartz_font_info font_info = {};
+    font_info.font = font;
+
+    size_t id = resources_context.fonts.size();
+    resources_context.fonts.push_back(font_info);
+    return { id };
+}
+
+quartz_vec2 quartz_font_get_text_size(quartz_font font, float font_size, const char* text)
+{
+    const quartz_font_info& font_info = resources_context.fonts[font.id];
+
+    float scale = font_size / QUARTZ_BASE_FONT_SIZE;
+    float height = quartz_font_get_ascender(font) * scale;
+    float width = 0;
+
+    size_t text_len = strlen(text);
+
+    for(size_t i = 0; i < text_len; i++)
+    {
+        quartz_glyph_info glyph = quartz_font_get_glyph_info(font, text[i]);
+        width += glyph.advance_x * scale;
+    }
+
+    return { width, height };
+}
+
+float quartz_font_get_ascender(quartz_font font)
+{
+    quartz_font_info& font_info = resources_context.fonts[font.id];
+    return font_info.font->size->metrics.ascender >> 6;
+}
+
+float quartz_font_get_descender(quartz_font font)
+{
+    quartz_font_info& font_info = resources_context.fonts[font.id];
+    return font_info.font->size->metrics.descender >> 6;
+}
+
+quartz_glyph_info quartz_font_get_glyph_info(quartz_font font, unsigned long codepoint)
+{
+    quartz_font_info& font_info = resources_context.fonts[font.id];
+
+    auto glyph = std::find_if(font_info.cached_glyphs.begin(), 
+                              font_info.cached_glyphs.end(),
+                              [=](const auto& glyph) {
+                                  return glyph.codepoint == codepoint;
+                              });
+
+    if(glyph == font_info.cached_glyphs.end())
+    {
+        FT_Face& face = font_info.font;
+
+        FT_Set_Pixel_Sizes(face, 0, QUARTZ_BASE_FONT_SIZE);
+        FT_Set_Char_Size(face, 0, QUARTZ_BASE_FONT_SIZE << 6, 72, 72);
+
+        if(FT_Load_Char(face, codepoint, FT_LOAD_DEFAULT) != FT_Err_Ok)
+            QUARTZ_ASSERT(false, "Could not load char from font!");
+
+        if(FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL))
+            QUARTZ_ASSERT(false, "Could not render glyph!");
+
+        FT_Bitmap bitmap = face->glyph->bitmap;
+        int width = bitmap.width;
+        int height = bitmap.rows;
+        unsigned char* buffer = bitmap.buffer;
+
+        unsigned char* rgba_buffer = new unsigned char[width * height * 4];
+
+        for(int i = 0, j = 0; i < width * height; i++, j+=4)
+        {
+            rgba_buffer[j] = 255;
+            rgba_buffer[j+1] = 255;
+            rgba_buffer[j+2] = 255;
+            rgba_buffer[j+3] = buffer[i];
+        }
+
+        auto glyph_metrics = face->glyph->metrics;
+        quartz_texture char_texture = quartz_make_texture(width, height, rgba_buffer);
+
+        quartz_glyph_info char_glyph = {};
+        char_glyph.codepoint = codepoint;
+        
+        // Metrics
+        char_glyph.advance_x = glyph_metrics.horiAdvance >> 6;
+        char_glyph.bearing_y = glyph_metrics.horiBearingY >> 6;
+
+        // Sprite
+        char_glyph.sprite.atlas = char_texture;
+        char_glyph.sprite.offset = { 0, 0 };
+        char_glyph.sprite.size = { (unsigned int)width, (unsigned int)height };
+        
+        delete[] rgba_buffer;
+
+        font_info.cached_glyphs.push_back(char_glyph);
+        return char_glyph;
+    }
+
+    return *glyph;
 }
 
 static unsigned int quartz_partial_shader_from_source(unsigned int type, const char* code)

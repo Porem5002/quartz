@@ -58,6 +58,7 @@ QUARTZ_DEF void quartz_render2D_sprite(quartz_sprite sprite, quartz_vec2 pos, qu
 QUARTZ_DEF void quartz_render2D_texture(quartz_texture texture, quartz_vec2 pos, quartz_vec2 scale QUARTZ_CPP_ONLY(= {1.0f, 1.0f}), float rotation QUARTZ_CPP_ONLY(= 0.0f), quartz_color tint QUARTZ_CPP_ONLY(= QUARTZ_WHITE));
 QUARTZ_DEF void quartz_render2D_quad(quartz_color color, quartz_vec2 pos, quartz_vec2 scale, float rotation QUARTZ_CPP_ONLY(= 0.0f));
 QUARTZ_DEF void quartz_render2D_circle(quartz_color color, quartz_vec2 pos, float radius);
+QUARTZ_DEF void quartz_render2D_text(quartz_font font, float font_size, const char* text, quartz_vec2 pos, quartz_color color);
 QUARTZ_DEF void quartz_render2D_flush();
 
 #endif

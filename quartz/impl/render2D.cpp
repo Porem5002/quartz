@@ -284,6 +284,31 @@ void quartz_render2D_circle(quartz_color color, quartz_vec2 pos, float radius)
     quartz_render2D_sprite_ex(QUARTZ_PRIMITIVE2D_CIRCLE, render2D_context.quad_sprite, pos, {diameter, diameter}, 0.0f, color);
 }
 
+void quartz_render2D_text(quartz_font font, float font_size, const char* text, quartz_vec2 pos, quartz_color color)
+{
+    float scale = font_size / QUARTZ_BASE_FONT_SIZE;
+
+    // Make Y lineup with the baseline
+    pos.y -= quartz_font_get_ascender(font) * scale;
+
+    size_t text_len = strlen(text);
+
+    for(size_t i = 0; i < text_len; i++)
+    {
+        quartz_glyph_info glyph = quartz_font_get_glyph_info(font, text[i]);
+        quartz_sprite sprite = glyph.sprite;
+
+        float scaled_advance_x = glyph.advance_x * scale;
+        pos.x += scaled_advance_x / 2.0f;
+
+        quartz_vec2 curr_pos = pos;
+        curr_pos.y += (glyph.bearing_y - glyph.sprite.size.y / 2.0f) * scale;
+
+        quartz_render2D_sprite(sprite, curr_pos, {scale, scale}, 0.0f, color);
+        pos.x += scaled_advance_x / 2.0f;
+    }
+}
+
 void quartz_render2D_flush()
 {
     if(render2D_context.instance_count == 0) return;
