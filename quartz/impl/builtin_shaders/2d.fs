@@ -15,12 +15,6 @@ out vec4 fragColor;
 const float MODE_QUAD = 0.0;
 const float MODE_CIRCLE = 1.0;
 
-// TODO: Calculate fade based on the on screen size of the circle to make it even smoother overall
-// Recommended values:
-//    big circles -> 0.01
-//    small circles -> 0.1 
-const float CIRCLE_FADE = 0.01;
-
 void main()
 {
     fragColor = texture(u_textures[int(f_textureIndex)], f_texturePos) * f_color;
@@ -28,7 +22,9 @@ void main()
     if(f_mode == MODE_CIRCLE)
     {
         float d = 1.0 - 2.0 * length(f_innerCoords - 0.5);
-        float t = smoothstep(0.0, CIRCLE_FADE, d);
+        // fwidth is used to calculate a better fade value for the specific circle size
+        float fade = fwidth(d);
+        float t = smoothstep(0.0, fade, d);
         fragColor.a *= t;
     }
 })"
