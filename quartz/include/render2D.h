@@ -50,6 +50,8 @@ QUARTZ_DEF quartz_mat3 quartz_camera2D_get_projection(const quartz_camera2D* cam
 QUARTZ_DEF quartz_vec2 quartz_camera2D_to_world_through_viewport(const quartz_camera2D* camera, quartz_ivec2 position, quartz_viewport viewport);
 
 QUARTZ_DEF void quartz_render2D_init();
+QUARTZ_DEF void quartz_render2D_set_shader(quartz_shader shader);
+QUARTZ_DEF quartz_shader quartz_render2D_get_shader();
 QUARTZ_DEF void quartz_render2D_set_viewport(quartz_viewport viewport);
 QUARTZ_DEF void quartz_render2D_set_camera(const quartz_camera2D* camera);
 QUARTZ_DEF void quartz_render2D_sprite_ex(quartz_primitive2D primitive, quartz_sprite sprite, quartz_vec2 pos, quartz_vec2 scale QUARTZ_CPP_ONLY(= {1.0f, 1.0f}), float rotation QUARTZ_CPP_ONLY(= 0.0f), quartz_color tint QUARTZ_CPP_ONLY(= QUARTZ_WHITE));

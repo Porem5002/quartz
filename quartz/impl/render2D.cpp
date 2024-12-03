@@ -217,6 +217,17 @@ void quartz_render2D_init()
     render2D_context.projection = quartz_camera2D_get_projection(&default_camera);
 }
 
+void quartz_render2D_set_shader(quartz_shader shader)
+{
+    // TODO: Validate if we are changing the shader when the buffer is empty 
+    render2D_context.shader = shader;
+}
+
+quartz_shader quartz_render2D_get_shader()
+{
+    return render2D_context.shader;
+}
+
 void quartz_render2D_set_viewport(quartz_viewport viewport)
 {
     render2D_context.viewport = viewport;

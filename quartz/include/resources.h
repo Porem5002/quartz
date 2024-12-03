@@ -103,8 +103,7 @@ QUARTZ_STRUCT_DEF(quartz_shader)
 #endif
 };
 
-//TODO: Implement quartz_load_shader
-//QUARTZ_DEF quartz_shader quartz_load_shader(const char* vs_path, const char* fs_path);
+QUARTZ_DEF quartz_shader quartz_load_shader(const char* vs_path, const char* fs_path);
 QUARTZ_DEF quartz_shader quartz_make_shader(const char* vs_code, const char* fs_code);
 QUARTZ_DEF void quartz_use_shader(quartz_shader shader);
 QUARTZ_DEF quartz_shader_info quartz_shader_get_info(quartz_shader shader);

@@ -57,6 +57,7 @@ static quartz_resources resources_context;
 
 static unsigned int quartz_partial_shader_from_source(unsigned int shader_type, const char* shader_src);
 static unsigned int quartz_shader_from_partial_shaders(unsigned int vs_id, unsigned int fs_id);
+static char* quartz_read_file(const char* path);
 
 void quartz_resources_init()
 {
@@ -74,11 +75,19 @@ void quartz_resources_finish()
     FT_Done_FreeType(resources_context.ft_library);
 }
 
-//TODO: Implement quartz_load_shader
-/*quartz_shader quartz_load_shader(const char* vs_path, const char* fs_path)
+quartz_shader quartz_load_shader(const char* vs_path, const char* fs_path)
 {
-    return {};
-}*/
+    char* vs_code = quartz_read_file(vs_path);
+    QUARTZ_ASSERT(vs_code != NULL, "Could not load vertex shader file");
+
+    char* fs_code = quartz_read_file(fs_path);
+    QUARTZ_ASSERT(fs_code != NULL, "Could not load fragment shader file");
+
+    quartz_shader shader = quartz_make_shader(vs_code, fs_code);
+    delete [] vs_code;
+    delete [] fs_code;
+    return shader;
+}
 
 quartz_shader quartz_make_shader(const char* vs_code, const char* fs_code)
 {
@@ -328,4 +337,27 @@ static unsigned int quartz_shader_from_partial_shaders(unsigned int vs_id, unsig
     }
 
     return id;
+}
+
+static char* quartz_read_file(const char* path)
+{
+    FILE* file = fopen(path, "r");
+    if(file == NULL) return NULL;
+
+    size_t size;
+    fseek(file, 0, SEEK_END);
+    size = ftell(file);
+    fseek(file, 0, SEEK_SET);
+
+    char* data = new char[size + 1];
+
+    // size is reassigned because text length might not be equal to byte count because of characters like '\r'
+    // and the fact that they are removed when the file is in text mode
+    size = fread(data, 1, size, file);
+
+    data[size] = '\0';
+
+    fclose(file);
+
+    return data;
 }
