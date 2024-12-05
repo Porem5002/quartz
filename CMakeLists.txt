@@ -38,7 +38,6 @@ else()
 endif()
 
 target_include_directories(${quartz} PRIVATE "third_party/" "third_party/GL/" "third_party/freetype/")
-target_link_libraries(${quartz} PRIVATE user32 opengl32 gdi32)
 
 # Examples
 if(EXAMPLES)

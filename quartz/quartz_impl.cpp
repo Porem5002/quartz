@@ -22,6 +22,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+// Windows Dependencies
+#pragma comment(lib, "user32.lib")
+#pragma comment(lib, "opengl32.lib")
+#pragma comment(lib, "gdi32.lib")
+
 #include "impl/base.cpp"
 #include "impl/math.cpp"
 #include "impl/resources.cpp"
