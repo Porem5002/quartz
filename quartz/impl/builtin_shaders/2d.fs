@@ -14,6 +14,7 @@ out vec4 fragColor;
 
 const float MODE_QUAD = 0.0;
 const float MODE_CIRCLE = 1.0;
+const float MODE_SDF = 2.0;
 
 void main()
 {
@@ -26,5 +27,12 @@ void main()
         float fade = fwidth(d);
         float t = smoothstep(0.0, fade, d);
         fragColor.a *= t;
+    }
+    else if(f_mode == MODE_SDF)
+    {
+        float d = fragColor.a / f_color.a;
+        float fade = fwidth(d);
+        float t = smoothstep(0.5 - fade, 0.5 + fade, d);
+        fragColor.a = t * f_color.a;
     }
 })"

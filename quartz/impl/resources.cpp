@@ -240,7 +240,7 @@ quartz_glyph_info quartz_font_get_glyph_info(quartz_font font, unsigned long cod
         if(FT_Load_Char(face, codepoint, FT_LOAD_DEFAULT) != FT_Err_Ok)
             QUARTZ_ASSERT(false, "Could not load char from font!");
 
-        if(FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL))
+        if(FT_Render_Glyph(face->glyph, FT_RENDER_MODE_SDF))
             QUARTZ_ASSERT(false, "Could not render glyph!");
 
         FT_Bitmap bitmap = face->glyph->bitmap;

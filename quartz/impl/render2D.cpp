@@ -233,6 +233,11 @@ void quartz_render2D_set_viewport(quartz_viewport viewport)
     render2D_context.viewport = viewport;
 }
 
+quartz_viewport quartz_render2D_get_viewport(quartz_viewport viewport)
+{
+    return render2D_context.viewport;
+}
+
 void quartz_render2D_set_camera(const quartz_camera2D* camera)
 {
     render2D_context.projection = quartz_camera2D_get_projection(camera);
@@ -315,7 +320,7 @@ void quartz_render2D_text(quartz_font font, float font_size, const char* text, q
         quartz_vec2 curr_pos = pos;
         curr_pos.y += (glyph.bearing_y - glyph.sprite.size.y / 2.0f) * scale;
 
-        quartz_render2D_sprite(sprite, curr_pos, {scale, scale}, 0.0f, color);
+        quartz_render2D_sprite_ex(QUARTZ_PRIMITIVE2D_SDF, sprite, curr_pos, {scale, scale}, 0.0f, color);
         pos.x += scaled_advance_x / 2.0f;
     }
 }

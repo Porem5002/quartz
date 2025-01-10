@@ -175,6 +175,11 @@ void quartz_set_fixed_delta_time(float fixed_delta_time)
     base_context.fixed_delta_time = fixed_delta_time;
 }
 
+void quartz_quit()
+{
+    base_context.window.running = false;
+}
+
 bool quartz_is_startup()
 {
     return base_context.lifetime_mode == QUARTZ_LIFETIME_PRE_UPDATE ||

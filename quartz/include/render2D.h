@@ -36,6 +36,7 @@ QUARTZ_ENUM_DEF(quartz_primitive2D, uint16_t)
 {
     QUARTZ_PRIMITIVE2D_QUAD,
     QUARTZ_PRIMITIVE2D_CIRCLE,
+    QUARTZ_PRIMITIVE2D_SDF,
 };
 
 QUARTZ_STRUCT_DEF(quartz_camera2D)
@@ -53,6 +54,7 @@ QUARTZ_DEF void quartz_render2D_init();
 QUARTZ_DEF void quartz_render2D_set_shader(quartz_shader shader);
 QUARTZ_DEF quartz_shader quartz_render2D_get_shader();
 QUARTZ_DEF void quartz_render2D_set_viewport(quartz_viewport viewport);
+QUARTZ_DEF quartz_viewport quartz_render2D_get_viewport(quartz_viewport viewport);
 QUARTZ_DEF void quartz_render2D_set_camera(const quartz_camera2D* camera);
 QUARTZ_DEF void quartz_render2D_sprite_ex(quartz_primitive2D primitive, quartz_sprite sprite, quartz_vec2 pos, quartz_vec2 scale QUARTZ_CPP_ONLY(= {1.0f, 1.0f}), float rotation QUARTZ_CPP_ONLY(= 0.0f), quartz_color tint QUARTZ_CPP_ONLY(= QUARTZ_WHITE));
 QUARTZ_DEF void quartz_render2D_texture_ex(quartz_primitive2D primitive, quartz_texture texture, quartz_vec2 pos, quartz_vec2 scale QUARTZ_CPP_ONLY(= {1.0f, 1.0f}), float rotation QUARTZ_CPP_ONLY(= 0.0f), quartz_color tint QUARTZ_CPP_ONLY(= QUARTZ_WHITE));

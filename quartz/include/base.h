@@ -40,6 +40,7 @@ QUARTZ_DEF bool quartz_fixed_update();
 QUARTZ_DEF void quartz_set_vsync(bool active);
 QUARTZ_DEF void quartz_set_fixed_delta_time(float fixed_delta_time);
 
+QUARTZ_DEF void quartz_quit();
 QUARTZ_DEF bool quartz_is_startup();
 QUARTZ_DEF bool quartz_is_running();
 QUARTZ_DEF float quartz_get_delta_time();
