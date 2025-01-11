@@ -37,6 +37,8 @@ SOFTWARE.
 #include "../include/gfx_info.h"
 #include "../include/notify.h"
 
+#include "internals/window.h"
+
 enum quartz_lifetime_mode
 {
     QUARTZ_LIFETIME_PRE_UPDATE,
@@ -86,9 +88,7 @@ void quartz_resources_finish();
 
 void quartz_start(int width, int height, const char* title)
 {
-    base_context.window = quartz_window_create(width, height, title);
-    // Since we move the created window to base_context.window we need to notify that the address changed
-    quartz_window_sync_ptr(&base_context.window);
+    quartz_window_create(&base_context.window, width, height, title);
 
     gapil_load();
 

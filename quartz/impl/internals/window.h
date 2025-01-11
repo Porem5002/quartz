@@ -22,19 +22,28 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef QUARTZ_WINDOW_HEADER
-#define QUARTZ_WINDOW_HEADER
+#ifndef QUARTZ_WINDOW_INTERNALS_HEADER
+#define QUARTZ_WINDOW_INTERNALS_HEADER
 
-#include <stdint.h>
+#include "..\..\include\api_compat.h"
+#include "..\..\include\math.h"
 
-#include "api_compat.h"
+#ifdef _WIN32
+#include <windows.h>
+#endif
 
-QUARTZ_STRUCT_DEF(quartz_window);
+QUARTZ_STRUCT_DEF(quartz_window)
+{
+    bool running;
+    bool resized;
+    quartz_ivec2 size;
+    quartz_ivec2 mouse_pos;
 
-QUARTZ_DEF void quartz_window_create(quartz_window* window, int width, int height, const char* title);
-QUARTZ_DEF void quartz_window_update(quartz_window* window);
-QUARTZ_DEF void quartz_window_swap_buffers(quartz_window* window);
-QUARTZ_DEF void quartz_window_sync_address(quartz_window* window);
-QUARTZ_DEF void quartz_window_destroy(quartz_window* window);
+    #if _WIN32
+        HWND wnd;
+        HDC dc;
+        HGLRC rc;
+    #endif
+};
 
 #endif
