@@ -24,7 +24,7 @@ SOFTWARE.
 
 #include <gapil.h>
 
-#include "../include/common.h"
+#include "../include/notify.h"
 #include "../include/window.h"
 #include "../include/input.h"
 
@@ -44,7 +44,7 @@ quartz_window quartz_window_create(int width, int height, const char* title)
     wc.lpszClassName = title; // This is not the title, but we use title as a unique identifier of the window
     wc.lpfnWndProc = quartz_windows_window_callback; // Window callback function
 
-    QUARTZ_ASSERT(RegisterClassA(&wc), "Failed on call to RegisterClassA during window creation");
+    quartz_assert(RegisterClassA(&wc), "Failed on call to RegisterClassA during window creation");
 
     DWORD dwStyle = WS_OVERLAPPEDWINDOW;
 
@@ -53,10 +53,10 @@ quartz_window quartz_window_create(int width, int height, const char* title)
         quartz_window q_window = {};
         q_window.win_window = CreateWindowExA(0, title, // Unique identifier again
                                         title, dwStyle, 100, 100, width, height, NULL, NULL, instance, &q_window);
-        QUARTZ_ASSERT(q_window.win_window != NULL, "Failed to create dummy window for OpenGL setup!");
+        quartz_assert(q_window.win_window != NULL, "Failed to create dummy window for OpenGL setup!");
 
         q_window.win_dc = GetDC(q_window.win_window );
-        QUARTZ_ASSERT(q_window.win_dc != NULL, "Failed to get DC!");
+        quartz_assert(q_window.win_dc != NULL, "Failed to get DC!");
 
         PIXELFORMATDESCRIPTOR pfd = {};
         pfd.nSize = sizeof(pfd);
@@ -68,13 +68,13 @@ quartz_window quartz_window_create(int width, int height, const char* title)
         pfd.cDepthBits = 24;
 
         int pixelFormat = ChoosePixelFormat(q_window.win_dc, &pfd);
-        QUARTZ_ASSERT(pixelFormat != 0, "Failed to choose pixel format!");
-        QUARTZ_ASSERT(SetPixelFormat(q_window.win_dc, pixelFormat, &pfd), "Failed to set pixel format!");
+        quartz_assert(pixelFormat != 0, "Failed to choose pixel format!");
+        quartz_assert(SetPixelFormat(q_window.win_dc, pixelFormat, &pfd), "Failed to set pixel format!");
 
         // Create fake opengl rendering context
         q_window.win_rc = wglCreateContext(q_window.win_dc);
-        QUARTZ_ASSERT(q_window.win_rc != NULL, "Failed to create opengl context!");
-        QUARTZ_ASSERT(wglMakeCurrent(q_window.win_dc, q_window.win_rc) != 0, "Failed to make current!");
+        quartz_assert(q_window.win_rc != NULL, "Failed to create opengl context!");
+        quartz_assert(wglMakeCurrent(q_window.win_dc, q_window.win_rc) != 0, "Failed to make current!");
 
         gapil_load();
 
@@ -90,10 +90,10 @@ quartz_window quartz_window_create(int width, int height, const char* title)
     quartz_window window = {};
     window.win_window = CreateWindowExA(0, title, // Unique identifier again
                                     title, dwStyle, 100, 100, width, height, NULL, NULL, instance, &window);
-    QUARTZ_ASSERT(window.win_window != NULL, "Failed to create dummy window for OpenGL setup!");
+    quartz_assert(window.win_window != NULL, "Failed to create dummy window for OpenGL setup!");
 
     window.win_dc = GetDC(window.win_window);
-    QUARTZ_ASSERT(window.win_dc != NULL, "Failed to get DC!");
+    quartz_assert(window.win_dc != NULL, "Failed to get DC!");
 
     const int pixelAttribs [] = {
         WGL_DRAW_TO_WINDOW_ARB, GL_TRUE,
@@ -110,13 +110,13 @@ quartz_window quartz_window_create(int width, int height, const char* title)
     UINT numPixelFormats;
     int pixelFormat = 0;
 
-    QUARTZ_ASSERT(wglChoosePixelFormatARB(window.win_dc, pixelAttribs, 0, 1, &pixelFormat, &numPixelFormats),
+    quartz_assert(wglChoosePixelFormatARB(window.win_dc, pixelAttribs, 0, 1, &pixelFormat, &numPixelFormats),
                   "Failed call to 'wglChoosePixelFormatARB'");
 
     PIXELFORMATDESCRIPTOR pfd = {};
     DescribePixelFormat(window.win_dc, pixelFormat, sizeof(PIXELFORMATDESCRIPTOR), &pfd);
 
-    QUARTZ_ASSERT(SetPixelFormat(window.win_dc, pixelFormat, &pfd), "Failed to SetPixelFormat");
+    quartz_assert(SetPixelFormat(window.win_dc, pixelFormat, &pfd), "Failed to SetPixelFormat");
 
     const int contextAttribs [] = {
         WGL_CONTEXT_MAJOR_VERSION_ARB, 4,
@@ -127,8 +127,8 @@ quartz_window quartz_window_create(int width, int height, const char* title)
     };
 
     window.win_rc = wglCreateContextAttribsARB(window.win_dc, 0, contextAttribs);
-    QUARTZ_ASSERT(window.win_rc != NULL, "Failed to create opengl context!");
-    QUARTZ_ASSERT(wglMakeCurrent(window.win_dc, window.win_rc), "Failed to make current!");
+    quartz_assert(window.win_rc != NULL, "Failed to create opengl context!");
+    quartz_assert(wglMakeCurrent(window.win_dc, window.win_rc), "Failed to make current!");
 
     ShowWindow(window.win_window, SW_SHOW);
 
@@ -178,7 +178,7 @@ static LRESULT CALLBACK quartz_windows_window_callback(HWND win_window, UINT msg
         {
             CREATESTRUCTA* creation_data = (CREATESTRUCTA*)lParam;
             quartz_window* window = (quartz_window*)creation_data->lpCreateParams;
-            QUARTZ_ASSERT(window != nullptr, "Invalid window in window callback!");
+            quartz_assert(window != nullptr, "Invalid window in window callback!");
             SetWindowLongPtr(win_window, GWLP_USERDATA, (LONG_PTR)window);
 
             RECT rect;
@@ -193,13 +193,13 @@ static LRESULT CALLBACK quartz_windows_window_callback(HWND win_window, UINT msg
         }
         case WM_CLOSE:
         {
-            QUARTZ_ASSERT(window != nullptr, "Invalid window in window callback!");
+            quartz_assert(window != nullptr, "Invalid window in window callback!");
             window->running = false;
             break;
         }
         case WM_SIZE:
         {
-            QUARTZ_ASSERT(window != nullptr, "Invalid window in window callback!");
+            quartz_assert(window != nullptr, "Invalid window in window callback!");
 
             RECT rect;
             GetClientRect(window->win_window, &rect);
@@ -213,7 +213,7 @@ static LRESULT CALLBACK quartz_windows_window_callback(HWND win_window, UINT msg
         }
         case WM_MOUSEMOVE:
         {
-            QUARTZ_ASSERT(window != nullptr, "Invalid window in window callback!");
+            quartz_assert(window != nullptr, "Invalid window in window callback!");
 
             POINT mouse_pos;
             GetCursorPos(&mouse_pos);
@@ -295,7 +295,7 @@ static quartz_keycode quartz_windows_map_key(WPARAM virtual_key)
         default: return QUARTZ_KEY_NONE;
     }
 
-    QUARTZ_ASSERT(false, "Unreachable");
+    quartz_fail("Unreachable");
 }
 
 #endif

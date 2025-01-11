@@ -28,7 +28,7 @@ SOFTWARE.
 #include <stdlib.h>
 #include <stdint.h>
 
-#include "common.h"
+#include "colors.h"
 #include "viewport.h"
 
 QUARTZ_DEF void quartz_start(int width, int height, const char* title);

@@ -28,7 +28,7 @@ SOFTWARE.
 #include <stdlib.h>
 #include <stdint.h>
 
-#include "common.h"
+#include "colors.h"
 #include "viewport.h"
 #include "resources.h"
 

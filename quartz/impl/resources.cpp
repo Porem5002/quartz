@@ -33,7 +33,7 @@ SOFTWARE.
 #include FT_FREETYPE_H
 
 #include "..\include\resources.h"
-#include "..\include\common.h"
+#include "..\include\notify.h"
 #include "..\include\gfx_info.h"
 
 struct quartz_font_info
@@ -62,7 +62,7 @@ static char* quartz_read_file(const char* path);
 void quartz_resources_init()
 {
     if(FT_Init_FreeType(&resources_context.ft_library) != FT_Err_Ok)
-        QUARTZ_ASSERT(false, "Could not initialize FreeType!");
+        quartz_fail("Could not initialize FreeType!");
 
     // Setup defines for shaders so that they take into consideration the platforms capabilities
     std::stringstream s;
@@ -78,10 +78,10 @@ void quartz_resources_finish()
 quartz_shader quartz_load_shader(const char* vs_path, const char* fs_path)
 {
     char* vs_code = quartz_read_file(vs_path);
-    QUARTZ_ASSERT(vs_code != NULL, "Could not load vertex shader file");
+    quartz_assert(vs_code != NULL, "Could not load vertex shader file");
 
     char* fs_code = quartz_read_file(fs_path);
-    QUARTZ_ASSERT(fs_code != NULL, "Could not load fragment shader file");
+    quartz_assert(fs_code != NULL, "Could not load fragment shader file");
 
     quartz_shader shader = quartz_make_shader(vs_code, fs_code);
     delete [] vs_code;
@@ -125,7 +125,7 @@ quartz_texture quartz_load_texture(const char* path)
 {
     int w, h, channels;
     unsigned char* data = stbi_load(path, &w, &h, &channels, 4);
-    QUARTZ_ASSERT(data != nullptr, "Could not load texture from the path");
+    quartz_assert(data != nullptr, "Could not load texture from the path");
     
     quartz_texture texture = quartz_make_texture(w, h, data);
     stbi_image_free(data);
@@ -179,7 +179,7 @@ quartz_font quartz_load_font(const char* font_path)
 {
     FT_Face font;
     if(FT_New_Face(resources_context.ft_library, font_path, 0, &font) != FT_Err_Ok)
-        QUARTZ_ASSERT(false, "Could not initialize font!");
+        quartz_fail("Could not initialize font!");
 
     quartz_font_info font_info = {};
     font_info.font = font;
@@ -238,10 +238,10 @@ quartz_glyph_info quartz_font_get_glyph_info(quartz_font font, unsigned long cod
         FT_Set_Char_Size(face, 0, QUARTZ_BASE_FONT_SIZE << 6, 72, 72);
 
         if(FT_Load_Char(face, codepoint, FT_LOAD_DEFAULT) != FT_Err_Ok)
-            QUARTZ_ASSERT(false, "Could not load char from font!");
+            quartz_fail("Could not load char from font!");
 
         if(FT_Render_Glyph(face->glyph, FT_RENDER_MODE_SDF))
-            QUARTZ_ASSERT(false, "Could not render glyph!");
+            quartz_fail("Could not render glyph!");
 
         FT_Bitmap bitmap = face->glyph->bitmap;
         int width = bitmap.width;
@@ -308,7 +308,7 @@ static unsigned int quartz_partial_shader_from_source(unsigned int type, const c
 
         char* log_msg = new char[log_length + 1];
         glGetShaderInfoLog(id, log_length, 0, log_msg);
-        QUARTZ_ASSERT(false, log_msg);
+        quartz_fail(log_msg);
         delete[] log_msg;
     }
 
@@ -332,7 +332,7 @@ static unsigned int quartz_shader_from_partial_shaders(unsigned int vs_id, unsig
 
         char* log_msg = new char[log_length + 1];
         glGetProgramInfoLog(id, log_length, &log_length, log_msg);
-        QUARTZ_ASSERT(false, log_msg);
+        quartz_fail(log_msg);
         delete[] log_msg;
     }
 

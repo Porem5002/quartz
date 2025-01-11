@@ -28,7 +28,7 @@ SOFTWARE.
 #include <gapil.h>
 
 #include "../include/render2D.h"
-#include "../include/common.h"
+#include "../include/notify.h"
 #include "../include/base.h"
 #include "../include/gfx_info.h"
 
@@ -367,7 +367,7 @@ static unsigned int quartz_render2D_push_new_texture(quartz_texture texture)
 
     if(!found)
     {
-        QUARTZ_ASSERT(render2D_context.texture_slots.size() <= render2D_context.texture_slot_cap, "Texture slot index exceeds capacity");
+        quartz_assert(render2D_context.texture_slots.size() <= render2D_context.texture_slot_cap, "Texture slot index exceeds capacity");
 
         if(render2D_context.texture_slots.size() == render2D_context.texture_slot_cap)
             quartz_render2D_flush();

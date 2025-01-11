@@ -22,12 +22,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef QUARTZ_INTERNALS_HEADER
-#define QUARTZ_INTERNALS_HEADER
+#ifndef QUARTZ_COLORS_HEADER
+#define QUARTZ_COLORS_HEADER
 
-#include <stdio.h>
-
-#include "math.h"
+#include "api_compat.h"
 
 QUARTZ_STRUCT_DEF(quartz_color)
 {
@@ -55,20 +53,5 @@ constexpr quartz_color QUARTZ_BLUE = { 0.0f, 0.0f, 1.0f, 1.0f };
 #define QUARTZ_BLUE ((quartz_color) { 0.0f, 0.0f, 1.0f, 1.0f })
 
 #endif
-
-#define QUARTZ_DEBUG_BREAK() __debugbreak()
-
-#define QUARTZ_LOG_INFO(MSG) do { fprintf(stderr, "INFO: %s\n", (MSG)); } while(0)
-#define QUARTZ_LOG_WARNING(MSG) do { fprintf(stderr, "WARNING: %s\n", (MSG)); } while(0)
-#define QUARTZ_LOG_ERROR(MSG) do { fprintf(stderr, "ERROR: %s\n", (MSG)); } while(0)
-
-#define QUARTZ_ASSERT(COND, MSG) do {\
-    if(!(COND))\
-    {\
-        fprintf(stderr, "ASSERTION FAILED: %s\n", (MSG));\
-        QUARTZ_DEBUG_BREAK();\
-        abort();\
-    }\
-} while(0)
 
 #endif

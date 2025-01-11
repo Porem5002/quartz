@@ -22,7 +22,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "include/common.h"
+#include "include/notify.h"
+#include "include/colors.h"
 #include "include/base.h"
 #include "include/math.h"
 #include "include/resources.h"

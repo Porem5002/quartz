@@ -22,23 +22,25 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-// Windows Dependencies
-#pragma comment(lib, "user32.lib")
-#pragma comment(lib, "opengl32.lib")
-#pragma comment(lib, "gdi32.lib")
+#include <windows.h>
 
-#include "impl/notify.cpp"
-#include "impl/base.cpp"
-#include "impl/math.cpp"
-#include "impl/resources.cpp"
-#include "impl/gfx_info.cpp"
-#include "impl/render2D.cpp"
-#include "impl/window.cpp"
-#include "impl/input.cpp"
-#include "impl/shapes.cpp"
+#include "../include/notify.h"
 
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
+#define QUARTZ_DEBUG_BREAK() __debugbreak()
 
-#define GAPIL_IMPLEMENTATION
-#include <gapil.h>
+static void quartz_msgbox_error(const char* title, const char* text)
+{
+    MessageBoxA(NULL, text, title, MB_OK | MB_ICONERROR);
+}
+
+void quartz_fail(const char* text)
+{
+    quartz_msgbox_error("Quartz Failure", text);
+    QUARTZ_DEBUG_BREAK();
+    exit(EXIT_FAILURE);
+}
+
+void quartz_assert(bool cond, const char* text)
+{
+    if(!cond) quartz_fail(text);
+}

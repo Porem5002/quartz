@@ -22,23 +22,18 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-// Windows Dependencies
-#pragma comment(lib, "user32.lib")
-#pragma comment(lib, "opengl32.lib")
-#pragma comment(lib, "gdi32.lib")
+#ifndef QUARTZ_NOTIFY_HEADER
+#define QUARTZ_NOTIFY_HEADER
 
-#include "impl/notify.cpp"
-#include "impl/base.cpp"
-#include "impl/math.cpp"
-#include "impl/resources.cpp"
-#include "impl/gfx_info.cpp"
-#include "impl/render2D.cpp"
-#include "impl/window.cpp"
-#include "impl/input.cpp"
-#include "impl/shapes.cpp"
+#include <stdio.h>
 
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
+#include "api_compat.h"
 
-#define GAPIL_IMPLEMENTATION
-#include <gapil.h>
+#define QUARTZ_LOG_INFO(MSG) do { fprintf(stderr, "INFO: %s\n", (MSG)); } while(0)
+#define QUARTZ_LOG_WARNING(MSG) do { fprintf(stderr, "WARNING: %s\n", (MSG)); } while(0)
+#define QUARTZ_LOG_ERROR(MSG) do { fprintf(stderr, "ERROR: %s\n", (MSG)); } while(0)
+
+QUARTZ_DEF void quartz_fail(const char* text);
+QUARTZ_DEF void quartz_assert(bool cond, const char* text);
+
+#endif

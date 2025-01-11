@@ -35,6 +35,7 @@ SOFTWARE.
 #include "../include/window.h"
 #include "../include/input.h"
 #include "../include/gfx_info.h"
+#include "../include/notify.h"
 
 enum quartz_lifetime_mode
 {
@@ -129,7 +130,7 @@ bool quartz_update()
             case QUARTZ_LIFETIME_ESTABLISHED_UPDATE:
                 break;
             default:
-                QUARTZ_ASSERT(false, "Unreachable");
+                quartz_fail("Unreachable");
         }
 
         // End Last Frame
@@ -251,7 +252,7 @@ static void APIENTRY quartz_gl_debug_callback(GLenum source, GLenum type,
             QUARTZ_LOG_INFO((const char*)message);
             break;
         case GL_DEBUG_SEVERITY_HIGH:
-            QUARTZ_ASSERT(false, message);
+            quartz_fail(message);
             break;
         default:
             QUARTZ_LOG_INFO((const char*)message);
