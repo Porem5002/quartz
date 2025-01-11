@@ -86,6 +86,8 @@ void quartz_resources_finish();
 void quartz_start(int width, int height, const char* title)
 {
     base_context.window = quartz_window_create(width, height, title);
+    // Since we move the created window to base_context.window we need to notify that the address changed
+    quartz_window_sync_ptr(&base_context.window);
 
     gapil_load();
 
@@ -105,8 +107,9 @@ void quartz_start(int width, int height, const char* title)
 }
 
 void quartz_finish()
-{
+{    
     quartz_resources_finish();
+    quartz_window_destroy(&base_context.window);
 }
 
 bool quartz_update()

@@ -51,5 +51,7 @@ QUARTZ_STRUCT_DEF(quartz_window)
 QUARTZ_DEF quartz_window quartz_window_create(int width, int height, const char* title);
 QUARTZ_DEF void quartz_window_update(quartz_window* window);
 QUARTZ_DEF void quartz_window_swap_buffers(quartz_window* window);
+QUARTZ_DEF void quartz_window_sync_ptr(quartz_window* window);
+QUARTZ_DEF void quartz_window_destroy(quartz_window* window);
 
 #endif

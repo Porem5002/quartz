@@ -30,8 +30,6 @@ SOFTWARE.
 
 #ifdef _WIN32
 
-static quartz_window* curr_active_window;
-
 static LRESULT CALLBACK quartz_windows_window_callback(HWND window, UINT msg, WPARAM wParam, LPARAM lParam);
 static quartz_keycode quartz_windows_map_key(WPARAM virtual_key);
 
@@ -53,10 +51,8 @@ quartz_window quartz_window_create(int width, int height, const char* title)
     // Generate temporary window, dc and rc so that we can extract special OPenGL functions 
     {
         quartz_window q_window = {};
-        curr_active_window = &q_window;
-
         q_window.win_window = CreateWindowExA(0, title, // Unique identifier again
-                                        title, dwStyle, 100, 100, width, height, NULL, NULL, instance, NULL);
+                                        title, dwStyle, 100, 100, width, height, NULL, NULL, instance, &q_window);
         QUARTZ_ASSERT(q_window.win_window != NULL, "Failed to create dummy window for OpenGL setup!");
 
         q_window.win_dc = GetDC(q_window.win_window );
@@ -82,15 +78,8 @@ quartz_window quartz_window_create(int width, int height, const char* title)
 
         gapil_load();
 
-        // Cleanup temporary contexts
-        wglMakeCurrent(q_window.win_dc, 0);
-        wglDeleteContext(q_window.win_rc);
-        ReleaseDC(q_window.win_window, q_window.win_dc);
-        DestroyWindow(q_window.win_window);
+        quartz_window_destroy(&q_window);
     }
-
-    quartz_window window = {};
-    curr_active_window = &window;
 
     RECT borderRect = {};
     AdjustWindowRectEx(&borderRect, dwStyle, 0, 0);
@@ -98,8 +87,9 @@ quartz_window quartz_window_create(int width, int height, const char* title)
     width += (int)(borderRect.right - borderRect.left);
     height += (int)(borderRect.bottom - borderRect.top);
 
+    quartz_window window = {};
     window.win_window = CreateWindowExA(0, title, // Unique identifier again
-                                    title, dwStyle, 100, 100, width, height, NULL, NULL, instance, NULL);
+                                    title, dwStyle, 100, 100, width, height, NULL, NULL, instance, &window);
     QUARTZ_ASSERT(window.win_window != NULL, "Failed to create dummy window for OpenGL setup!");
 
     window.win_dc = GetDC(window.win_window);
@@ -142,7 +132,6 @@ quartz_window quartz_window_create(int width, int height, const char* title)
 
     ShowWindow(window.win_window, SW_SHOW);
 
-    curr_active_window = nullptr;
     return window;
 }
 
@@ -150,16 +139,13 @@ void quartz_window_update(quartz_window* window)
 {
     MSG msg;
 
-    curr_active_window = window;
-    curr_active_window->resized = false;
+    window->resized = false;
 
     while(PeekMessageA(&msg, window->win_window, 0, 0, PM_REMOVE))
     {
         TranslateMessage(&msg);
         DispatchMessage(&msg); // Sends message to the callback function of the window
     }
-
-    curr_active_window = nullptr;
 }
 
 void quartz_window_swap_buffers(quartz_window* window)
@@ -167,9 +153,22 @@ void quartz_window_swap_buffers(quartz_window* window)
     SwapBuffers(window->win_dc);
 }
 
-static LRESULT CALLBACK quartz_windows_window_callback(HWND window, UINT msg, WPARAM wParam, LPARAM lParam)
+void quartz_window_sync_ptr(quartz_window* window)
 {
-    QUARTZ_ASSERT(curr_active_window != nullptr, "Invalid window in window callback!");
+    SetWindowLongPtr(window->win_window, GWLP_USERDATA, (LONG_PTR)window);
+}
+
+void quartz_window_destroy(quartz_window* window)
+{
+    wglMakeCurrent(window->win_dc, 0);
+    wglDeleteContext(window->win_rc);
+    ReleaseDC(window->win_window, window->win_dc);
+    DestroyWindow(window->win_window);
+}
+
+static LRESULT CALLBACK quartz_windows_window_callback(HWND win_window, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+    quartz_window* window = (quartz_window*)GetWindowLongPtr(win_window, GWLP_USERDATA);
 
     LRESULT result = 0;
 
@@ -177,43 +176,54 @@ static LRESULT CALLBACK quartz_windows_window_callback(HWND window, UINT msg, WP
     {
         case WM_CREATE:
         {
+            CREATESTRUCTA* creation_data = (CREATESTRUCTA*)lParam;
+            quartz_window* window = (quartz_window*)creation_data->lpCreateParams;
+            QUARTZ_ASSERT(window != nullptr, "Invalid window in window callback!");
+            SetWindowLongPtr(win_window, GWLP_USERDATA, (LONG_PTR)window);
+
             RECT rect;
-            GetClientRect(window, &rect);
+            GetClientRect(window->win_window, &rect);
 
             int width = (int)(rect.right - rect.left);
             int height = (int)(rect.bottom - rect.top);
 
-            curr_active_window->size = { width, height };
-            curr_active_window->running = true;
+            window->size = { width, height };
+            window->running = true;
             break;
         }
         case WM_CLOSE:
-            curr_active_window->running = false;
+        {
+            QUARTZ_ASSERT(window != nullptr, "Invalid window in window callback!");
+            window->running = false;
             break;
+        }
         case WM_SIZE:
         {
+            QUARTZ_ASSERT(window != nullptr, "Invalid window in window callback!");
+
             RECT rect;
-            GetClientRect(window, &rect);
+            GetClientRect(window->win_window, &rect);
 
             int new_width = (int)(rect.right - rect.left);
             int new_height = (int)(rect.bottom - rect.top);
 
-            curr_active_window->size = { new_width, new_height };
-            curr_active_window->resized = true;
-
+            window->size = { new_width, new_height };
+            window->resized = true;
             break;
         }
         case WM_MOUSEMOVE:
         {
+            QUARTZ_ASSERT(window != nullptr, "Invalid window in window callback!");
+
             POINT mouse_pos;
             GetCursorPos(&mouse_pos);
-            ScreenToClient(curr_active_window->win_window, &mouse_pos);
+            ScreenToClient(window->win_window, &mouse_pos);
             
-            int mouse_x = quartz_clamp((int)mouse_pos.x, 0, curr_active_window->size.x);
-            int mouse_y = quartz_clamp((int)mouse_pos.y, 0, curr_active_window->size.y);
+            int mouse_x = quartz_clamp((int)mouse_pos.x, 0, window->size.x);
+            int mouse_y = quartz_clamp((int)mouse_pos.y, 0, window->size.y);
 
-            curr_active_window->mouse_pos.x = mouse_x;
-            curr_active_window->mouse_pos.y = curr_active_window->size.y - mouse_y;
+            window->mouse_pos.x = mouse_x;
+            window->mouse_pos.y = window->size.y - mouse_y;
             break;
         }
         case WM_LBUTTONDOWN:
@@ -244,7 +254,7 @@ static LRESULT CALLBACK quartz_windows_window_callback(HWND window, UINT msg, WP
             break;
         }
         default:
-            result = DefWindowProcA(window, msg, wParam, lParam);
+            result = DefWindowProcA(win_window, msg, wParam, lParam);
             break;
     }
 
