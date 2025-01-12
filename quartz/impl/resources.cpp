@@ -116,11 +116,6 @@ quartz_shader_info quartz_shader_get_info(quartz_shader shader)
     return resources_context.shaders[shader.id];
 }
 
-quartz_shader_info quartz_shader::get() const
-{
-    return quartz_shader_get_info(*this);
-}
-
 quartz_texture quartz_load_texture(const char* path)
 {
     int w, h, channels;
@@ -196,11 +191,6 @@ quartz_texture_filter quartz_texture_get_filter(quartz_texture texture)
 quartz_texture_info quartz_texture_get_info(quartz_texture texture)
 {
     return resources_context.textures[texture.id];
-}
-
-quartz_texture_info quartz_texture::get() const
-{
-    return quartz_texture_get_info(*this);
 }
 
 quartz_font quartz_load_font(const char* font_path)

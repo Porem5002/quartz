@@ -129,4 +129,18 @@ QUARTZ_DEF float quartz_font_get_descender(quartz_font font);
 QUARTZ_DEF quartz_vec2 quartz_font_get_text_size(quartz_font font, float font_size, const char* text);
 QUARTZ_DEF quartz_glyph_info quartz_font_get_glyph_info(quartz_font font, unsigned long codepoint);
 
+#ifdef QUARTZ_CPP
+
+inline quartz_texture_info quartz_texture::get() const
+{
+    return quartz_texture_get_info(*this);
+}
+
+inline quartz_shader_info quartz_shader::get() const
+{
+    return quartz_shader_get_info(*this);
+}
+
+#endif
+
 #endif
