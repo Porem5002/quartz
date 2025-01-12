@@ -26,13 +26,21 @@ SOFTWARE.
 #define QUARTZ_RESOURCES_HEADER
 
 #include <stdlib.h>
+#include <stdint.h>
 
 #include "math.h"
+
+QUARTZ_ENUM_DEF(quartz_texture_filter, uint16_t)
+{
+    QUARTZ_TEXTURE_FILTER_NEAREST,
+    QUARTZ_TEXTURE_FILTER_LINEAR,
+};
 
 QUARTZ_STRUCT_DEF(quartz_texture_info)
 {
     unsigned int glid;
     int width, height, channels;
+    quartz_texture_filter filter;
 };
 
 QUARTZ_STRUCT_DEF(quartz_texture)
@@ -111,6 +119,8 @@ QUARTZ_DEF quartz_shader_info quartz_shader_get_info(quartz_shader shader);
 QUARTZ_DEF quartz_texture quartz_load_texture(const char* path);
 QUARTZ_DEF quartz_texture quartz_make_texture(int width, int height, unsigned char* data);
 QUARTZ_DEF void quartz_bind_texture(quartz_texture texture, unsigned int slot);
+QUARTZ_DEF void quartz_texture_set_filter(quartz_texture texture, quartz_texture_filter filter);
+QUARTZ_DEF quartz_texture_filter quartz_texture_get_filter(quartz_texture texture);
 QUARTZ_DEF quartz_texture_info quartz_texture_get_info(quartz_texture texture);
 
 QUARTZ_DEF quartz_font quartz_load_font(const char* font_path);

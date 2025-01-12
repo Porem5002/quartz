@@ -142,20 +142,21 @@ quartz_texture quartz_make_texture(int width, int height, unsigned char* data)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
 
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    quartz_texture_info texture_info;
+    quartz_texture_info texture_info = {};
     texture_info.glid = id;
     texture_info.width = width;
     texture_info.height = height;
     texture_info.channels = 4;
+    texture_info.filter = QUARTZ_TEXTURE_FILTER_LINEAR;
 
     quartz_texture texture = { resources_context.textures.size() };
-    resources_context.textures.push_back(texture_info);
+    resources_context.textures.push_back(texture_info);    
     return texture;
 }
 
@@ -163,6 +164,33 @@ void quartz_bind_texture(quartz_texture texture, unsigned int slot)
 {
     glActiveTexture(GL_TEXTURE0 + slot);
     glBindTexture(GL_TEXTURE_2D, texture.get_glid());
+}
+
+void quartz_texture_set_filter(quartz_texture texture, quartz_texture_filter filter)
+{
+    quartz_texture_info* info = &resources_context.textures[texture.id];
+    
+    glBindTexture(GL_TEXTURE_2D, info->glid);
+
+    if(filter == QUARTZ_TEXTURE_FILTER_NEAREST)
+    {
+        info->filter = QUARTZ_TEXTURE_FILTER_NEAREST;
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    }
+    else if(filter == QUARTZ_TEXTURE_FILTER_LINEAR)
+    {
+        info->filter = QUARTZ_TEXTURE_FILTER_LINEAR;
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    }
+
+    glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+quartz_texture_filter quartz_texture_get_filter(quartz_texture texture)
+{
+    return resources_context.textures[texture.id].filter;
 }
 
 quartz_texture_info quartz_texture_get_info(quartz_texture texture)
