@@ -26,7 +26,7 @@ SOFTWARE.
 #include <string>
 #include <sstream>
 
-#include <gapil.h>
+#include <glad/glad.h>
 #include <stb_image.h>
 
 #include <ft2build.h>

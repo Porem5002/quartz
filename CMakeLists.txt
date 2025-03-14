@@ -11,17 +11,24 @@ if(MSVC)
     add_compile_options("/MT")
 endif()
 
+set(GLAD_SRC
+    "third_party/glad/include/KHR/khrplatform.h"
+    "third_party/glad/src/glad.c"
+    "third_party/glad/src/glad_wgl.c"
+    "third_party/glad/include/glad/glad.h"
+    "third_party/glad/include/glad/glad_wgl.h")
+
 # Library
 if(DYNAMIC)
     set(quartz "quartzdyn")
-    add_library(${quartz} SHARED "quartz/quartz_impl.cpp")
+    add_library(${quartz} SHARED "quartz/quartz_impl.cpp" ${GLAD_SRC})
     target_compile_options(${quartz} PRIVATE "-DQUARTZ_DYNAMIC_LIB_EXPORT")
 
     target_link_directories(${quartz} PRIVATE "third_party/freetype/lib")
     target_link_libraries(${quartz} PRIVATE "freetype.lib")
 else()
     set(quartz "quartz")
-    add_library(${quartz} STATIC "quartz/quartz_impl.cpp")
+    add_library(${quartz} STATIC "quartz/quartz_impl.cpp" ${GLAD_SRC})
 
     # Link quartz and freetype into a single static library
     if(MSVC)
@@ -37,7 +44,7 @@ else()
     endif()
 endif()
 
-target_include_directories(${quartz} PRIVATE "third_party/" "third_party/GL/" "third_party/freetype/")
+target_include_directories(${quartz} PRIVATE "third_party/" "third_party/glad/include/" "third_party/freetype/")
 
 # Examples
 if(EXAMPLES)

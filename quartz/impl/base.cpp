@@ -29,7 +29,8 @@ SOFTWARE.
 #include <chrono>
 
 #include <stb_image.h>
-#include <gapil.h>
+#include <glad/glad.h>
+#include <glad/glad_wgl.h>
 
 #include "../include/base.h"
 #include "../include/window.h"
@@ -90,7 +91,7 @@ void quartz_start(int width, int height, const char* title)
 {
     quartz_window_create(&base_context.window, width, height, title);
 
-    gapil_load();
+    gladLoadGL();
 
     glDebugMessageCallback(&quartz_gl_debug_callback, nullptr);
     glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);

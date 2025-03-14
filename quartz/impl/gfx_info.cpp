@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include <gapil.h>
+#include <glad/glad.h>
 
 #include "../include/gfx_info.h"
 

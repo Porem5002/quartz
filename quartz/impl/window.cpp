@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include <gapil.h>
+#include <glad/glad_wgl.h>
 
 #include "../include/notify.h"
 #include "../include/window.h"
@@ -78,7 +78,7 @@ void quartz_window_create(quartz_window* window, int width, int height, const ch
         quartz_assert(window.rc != NULL, "Failed to create opengl context!");
         quartz_assert(wglMakeCurrent(window.dc, window.rc) != 0, "Failed to make current!");
 
-        gapil_load();
+        gladLoadWGL(window.dc);
 
         quartz_window_destroy(&window);
     }

@@ -25,7 +25,7 @@ SOFTWARE.
 #include <cstring>
 #include <vector>
 
-#include <gapil.h>
+#include <glad/glad.h>
 
 #include "../include/render2D.h"
 #include "../include/notify.h"

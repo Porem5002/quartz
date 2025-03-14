@@ -39,6 +39,3 @@ SOFTWARE.
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
-
-#define GAPIL_IMPLEMENTATION
-#include <gapil.h>
