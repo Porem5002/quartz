@@ -103,37 +103,13 @@ quartz_vec2 quartz_camera2D_to_world_through_viewport(const quartz_camera2D* cam
 
 void quartz_render2D_init()
 {
-    #if 1 // Setup Shader
-    static const char* vertex_shader =
-        #include "builtin_shaders\2d.vs"
-    ;
-
-    static const char* frag_shader = 
-        #include "builtin_shaders\2d.fs"
-    ;
-
-    render2D_context.shader = quartz_make_shader(vertex_shader, frag_shader);
-    render2D_context.u_projection = glGetUniformLocation(render2D_context.shader.get_program_id(), "u_projection");
-    #endif
-
     render2D_context.instance_count = 0;
 
     // Setup texture slots
     render2D_context.texture_slot_cap = quartz_gfx_get_texture_unit_cap();
-    render2D_context.texture_slots.reserve(render2D_context.texture_slot_cap);
-
-    // Setup shader samplers for texture slots
-    std::vector<int> samplers;
-    samplers.resize(render2D_context.texture_slot_cap);
-
-    for(size_t i = 0; i < render2D_context.texture_slot_cap; i++)
-        samplers[i] = (int)i;
+    render2D_context.texture_slots.reserve(render2D_context.texture_slot_cap);    
     
-    GLuint u_textures = glGetUniformLocation(render2D_context.shader.get_program_id(), "u_textures");
-    quartz_use_shader(render2D_context.shader);
-    glUniform1iv(u_textures, render2D_context.texture_slot_cap, samplers.data());
-    
-    #if 1 // Setup OpenGL Attributes
+    // Setup shader buffer layouts
     float vertex_data [] = {
         -0.5, -0.5, 0, 1, // Bottom Left
         0.5, -0.5, 1, 1,  // Bottom Right
@@ -202,8 +178,31 @@ void quartz_render2D_init()
     glVertexAttribPointer(9, 1, GL_FLOAT, GL_FALSE, sizeof(instance_data), (const void*)offsetof(instance_data, slot_index));
     glVertexAttribDivisor(9, 1);
 
+    static const char* vertex_shader =
+        #include "builtin_shaders\2d.vs"
+    ;
+
+    static const char* frag_shader = 
+        #include "builtin_shaders\2d.fs"
+    ;
+
+    // Setup Shader
+    render2D_context.shader = quartz_make_shader(vertex_shader, frag_shader);
+    render2D_context.u_projection = glGetUniformLocation(render2D_context.shader.get_program_id(), "u_projection");
+
+    // Setup shader samplers for texture slots
+    std::vector<int> samplers;
+    samplers.resize(render2D_context.texture_slot_cap);
+
+    for(size_t i = 0; i < render2D_context.texture_slot_cap; i++)
+        samplers[i] = (int)i;
+    
+    GLuint u_textures = glGetUniformLocation(render2D_context.shader.get_program_id(), "u_textures");
+    quartz_use_shader(render2D_context.shader);
+    glUniform1iv(u_textures, render2D_context.texture_slot_cap, samplers.data());
+
+    glUseProgram(0);
     glBindVertexArray(0);
-    #endif
 
     // White pixel texture
     unsigned char quad_pixel [] = { 255, 255, 255, 255 };
