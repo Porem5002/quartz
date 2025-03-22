@@ -28,7 +28,6 @@ SOFTWARE.
 #include <vector>
 #include <chrono>
 
-#include <stb_image.h>
 #include <glad/glad.h>
 #include <glad/glad_wgl.h>
 
@@ -39,6 +38,14 @@ SOFTWARE.
 #include "../include/notify.h"
 
 #include "internals/window.h"
+
+// Windows Dependencies
+#pragma comment(lib, "user32.lib")
+#pragma comment(lib, "opengl32.lib")
+#pragma comment(lib, "gdi32.lib")
+
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
 
 enum quartz_lifetime_mode
 {
