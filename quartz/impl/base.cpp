@@ -256,9 +256,6 @@ static void APIENTRY quartz_gl_debug_callback(GLenum source, GLenum type,
     {
         case GL_DEBUG_SEVERITY_LOW:
         case GL_DEBUG_SEVERITY_MEDIUM:
-            //TODO: Check why renderer causes shader recompilation on the first call to glClear, triggering this
-            QUARTZ_LOG_INFO((const char*)message);
-            break;
         case GL_DEBUG_SEVERITY_HIGH:
             quartz_fail(message);
             break;
