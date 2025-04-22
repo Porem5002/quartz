@@ -50,6 +50,7 @@ struct quartz_render2D
 
     quartz_shader shader;
     unsigned int u_projection;
+    unsigned int u_textureCount;
 
     unsigned int va_id;
     unsigned int vertex_buffer_id;
@@ -188,6 +189,7 @@ void quartz_render2D_init()
 
     // Setup Shader
     render2D_context.shader = quartz_make_shader(vertex_shader, frag_shader);
+    render2D_context.u_textureCount = glGetUniformLocation(render2D_context.shader.get_program_id(), "u_textureCount");
     render2D_context.u_projection = glGetUniformLocation(render2D_context.shader.get_program_id(), "u_projection");
 
     // Setup shader samplers for texture slots
@@ -336,6 +338,9 @@ void quartz_render2D_flush()
                render2D_context.viewport.get_width(), render2D_context.viewport.get_height());
 
     quartz_use_shader(render2D_context.shader);
+
+    glUniform1i(render2D_context.u_textureCount, render2D_context.texture_slots.size());
+
     glUniformMatrix3fv(render2D_context.u_projection, 1, GL_FALSE, &render2D_context.projection.values[0][0]);
 
     glBindBuffer(GL_ARRAY_BUFFER, render2D_context.instances_buffer_id);
